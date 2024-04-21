@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Shedule</title>
+</head>
+<body class="bg-color-primary text-color-white tracking-wider">
+<header>
+    <nav class="container flex justify-between items-center relative">
+        <div class="w-[44rem] py-5 text-color-secondary font-bold text-2xl">
+            <a href="/">
+                <div class="text-color-white">Tournament Scheduling</div>
+                System
+            </a>
+        </div>
+        <div>
+            <ul class="hidden lg:flex items-center space-x-2">
+                <li><a href="/" class="hover:text-color-secondary ease-in duration-200 mr-2">Home</a></li>
+                <li><a href="tournament" class="hover:text-color-secondary ease-in duration-200 mr-2">View Schedules</a></li>
+                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="mytournaments"> Edit My Tournament</a></button></li>
+                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="tournamentnew"> Schedule Tournament</a></button></li>
+            </ul>
+        </div>
+
+        <div id="hamburger" class="lg:hidden cursor-pointer z-50" th:onclick="|document.getElementById('menu').classList.toggle('hidden');document.querySelector('.fa-solid').classList.toggle('fa-xmark');document.getElementById('home').classList.toggle('hidden');|">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+
+        <div id="menu" class="hidden lg:hidden bg-color-primary-dark h-[100vh] absolute inset-0">
+            <ul class="h-full grid place-items-center py-20">
+                <li ><a href="/" class="hover:text-color-secondary ease-in duration-200">Home</a></li>
+                <li><a href="tournament" class="hover:text-color-secondary ease-in duration-200">View Schedules</a></li>
+                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="mytournaments"> Edit My Tournament</a></button></li>
+                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="tournamentnew"> Schedule Tournament</a></button></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+<section class="bg-color-primary flex items-center justify-center mb-5">
+    <div class="bg-color-secondary p-2 rounded-lg border-2 border-black flex">
+        <div class=" px-8">
+            <h2 class="font-bold text-2xl mb-4 text-color-primary">Tournament Info</h2>
+            <form th:action="@{/tournament3}" th:object="${tournament}" method="post">
+                <div class="grid grid-cols-5 gap-4"> <!-- Using Tailwind's grid system with maximum 5 columns per row -->
+                    <div th:each="teamName, teamIndex : ${tournament.teamNames}" class="flex flex-col">
+                        <label th:text="${teamName}" class="font-bold text-lg text-color-primary"></label>
+                        <div th:each="index : ${#numbers.sequence(0, 10)}">
+                            <input required type="text" th:id="'team' + ${teamIndex.index} + '-' + ${index}" th:name="'teamNames[' + ${teamIndex.index} + '][' + ${index} + ']'" th:value="''" th:placeholder="'Name' + ${index + 1}" class="p-2 mt-2 mb-4 px-4 py-3 rounded-xl text-black border-2 border-color-primary" />
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <button data-modal-target="authentication-modal" class="mt-8 bg-color-primary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200" onclick="window.location.href='/tournamentnew';">Back</button>
+                    <button data-modal-target="authentication-modal" class=" mt-8 border-2 border-color-primary bg-green-500 px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200" id="abc">Next</button>
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

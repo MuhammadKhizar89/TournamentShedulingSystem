@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Home Page</title>
+</head>
+<body class="bg-color-primary text-color-white tracking-wider">
+
+<header>
+    <nav class="container flex justify-between items-center relative">
+        <div class="w-[44rem] py-5 text-color-secondary font-bold text-2xl">
+            <a href="/">
+                <div class="text-color-white">Tournament Scheduling</div>
+                System
+            </a>
+        </div>
+        <div>
+            <ul class="hidden lg:flex items-center space-x-2">
+                <li><a href="/" class="hover:text-color-secondary ease-in duration-200 mr-2">Home</a></li>
+                <li><a href="tournament" class="hover:text-color-secondary ease-in duration-200 mr-2">View Schedules</a></li>
+                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="mytournaments"> Edit My Tournament</a></button></li>
+                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="tournamentnew"> Schedule Tournament</a></button></li>
+            </ul>
+        </div>
+
+        <div id="hamburger" class="lg:hidden cursor-pointer z-50" th:onclick="|document.getElementById('menu').classList.toggle('hidden');document.querySelector('.fa-solid').classList.toggle('fa-xmark');document.getElementById('home').classList.toggle('hidden');|">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+
+        <div id="menu" class="hidden lg:hidden bg-color-primary-dark h-[100vh] absolute inset-0">
+            <ul class="h-full grid place-items-center py-20">
+                <li ><a href="/" class="hover:text-color-secondary ease-in duration-200">Home</a></li>
+                <li><a href="tournament" class="hover:text-color-secondary ease-in duration-200">View Schedules</a></li>
+                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="mytournaments"> Edit My Tournament</a></button></li>
+                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="tournamentnew"> Schedule Tournament</a></button></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+<main id="home">
+    <section class="relative">
+        <div class="w-80 h-80 bg-color-blob absolute top-0 -left-5 -z-10 blur-2xl opacity-30 overflow-hidden rounded-full"></div>
+        <div class="w-80 h-80 bg-color-secondary absolute bottom-10 right-0 -z-10 blur-2xl opacity-30 overflow-hidden rounded-full"></div>
+        <div class="container pt-20">
+            <div class="flex flex-col items-center z-20 md:flex-row ">
+                <div class=" text-center mb-12 md:text-left md:w-1/2 md:pr-10 ">
+                    <h1 class="text-3xl md:text-4xl font-bold leading-snug mb-4">
+                        Awesome Website To Manage and Schedule Tournament
+                    </h1>
+                    <p class="leading-relaxed md-10 mb-3">
+                        Welcome to our cricket tournament management website! Whether you're organizing local cricket matches, leagues, or tournaments, our platform provides the tools you need to efficiently manage schedules, teams, scores, and more. From creating fixtures to tracking player statistics, our platform simplifies the entire process, allowing you to focus on the excitement of the game. Join us today and elevate your cricket tournaments to the next level!
+                    </p>
+                    <div th:unless="${loggedIn}">
+                        <button onclick="openModal('authentication-modal')" class="bg-color-secondary px-4 py-3 mr-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">
+                            <a href="signin">Login</a>
+                        </button>
+                        <button class="bg-color-secondary px-3 py-3 rounded-md capitalize font-bold hover:opacity-200 ease-in duration-200">
+                            <a href="signup">Signup</a>
+                        </button>
+                    </div>
+
+                    <div th:if="${loggedIn}">
+                            <button type="submit" class="bg-color-secondary px-3 py-3 rounded-md capitalize font-bold hover:opacity-200 ease-in duration-200"><a href="logout">Logout</a></button>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <img th:src="@{home_pic1-removebg-preview.png}" />
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>
