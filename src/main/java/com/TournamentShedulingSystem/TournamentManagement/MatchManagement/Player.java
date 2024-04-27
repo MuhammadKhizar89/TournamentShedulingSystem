@@ -78,7 +78,19 @@ public class Player {
     @Column(nullable = false)
     private int wickets;
 
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id=" + id +
+                ", teamId=" + teamId +
+                ", name='" + name + '\'' +
+                ", runs=" + runs +
+                ", totalRuns=" + totalRuns +
+                ", wickets=" + wickets +
+                ", totalWickets=" + totalWickets +
+                '}';
+    }
+
     @Column(nullable = false)
     private int totalWickets;
-
 }

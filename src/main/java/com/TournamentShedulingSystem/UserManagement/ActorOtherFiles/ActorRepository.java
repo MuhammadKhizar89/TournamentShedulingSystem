@@ -1,4 +1,4 @@
-package com.TournamentShedulingSystem.UserManagement.ActorOtherFiles.repository;
+package com.TournamentShedulingSystem.UserManagement.ActorOtherFiles;
 import com.TournamentShedulingSystem.UserManagement.Actor;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,5 +9,5 @@ public interface ActorRepository extends JpaRepository<Actor, Long> {
     Optional<Actor> findByUsername(String username);
     boolean existsByUsername(String username);
     Optional<Actor> findByUsernameAndPassword(String username, String password); // New method for retrieving ID by username and password
-
+    Actor findByid(Long id); // New method declaration
 }

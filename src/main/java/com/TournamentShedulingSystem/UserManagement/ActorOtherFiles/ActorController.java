@@ -1,8 +1,7 @@
-package com.TournamentShedulingSystem.UserManagement.ActorOtherFiles.ActorController;
+package com.TournamentShedulingSystem.UserManagement.ActorOtherFiles;
 
-import com.TournamentShedulingSystem.TournamentManagement.TournamentOtherFiles.service.TournamentService;
+import com.TournamentShedulingSystem.TournamentManagement.TournamentOtherFiles.TournamentService;
 import com.TournamentShedulingSystem.UserManagement.Actor;
-import com.TournamentShedulingSystem.UserManagement.ActorOtherFiles.service.ActorService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -46,8 +45,6 @@ System.out.println(request.getSession().getAttribute("userId"));
             return "redirect:/"; // Redirect to root URL after successful signup
         }
     }
-
-
     @GetMapping("/signup")
     public String signup_Page(){
         return "signup_Page";
@@ -56,7 +53,6 @@ System.out.println(request.getSession().getAttribute("userId"));
     public String signin_Page(){
         return "signin_Page";
     }
-
     @PostMapping("/signin1")
     public String signin1(@RequestParam String username, @RequestParam String password, HttpSession session, Model model) {
         if (actorService.exists(username, password)) {

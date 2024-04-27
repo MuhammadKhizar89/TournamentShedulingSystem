@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Shedule</title>
+</head>
+<body class="bg-color-primary text-color-white tracking-wider">
+<header>
+    <nav class="container flex justify-between items-center relative">
+        <div class="w-[44rem] py-5 text-color-secondary font-bold text-2xl">
+            <a href="/">
+                <div class="text-color-white">Tournament Scheduling</div>
+                System
+            </a>
+        </div>
+        <div>
+            <ul class="hidden lg:flex items-center space-x-2">
+                <li><a href="/" class="hover:text-color-secondary ease-in duration-200 mr-2">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+<section class="bg-color-primary   mb-5 flex flex-col justify-center items-center">
+    <h2 class="font-bold text-2xl mb-4  pl-5 text-5xl text-center capitalize"  th:text="${tournament.nameOfTournament}"></h2>
+    <div class="bg-color-secondary border-color-secondary border-2 border-solid rounded-lg  w-[80%] ">
+        <nav class="container mb-3 w-[80%] mt-3 bg-color-secondary flex justify-between items-center relative ">
+            <ul class="lg:flex items-center space-x-2">
+                <li><a  th:href="@{'/viewTournament?id=' + ${tournament.id}}" class="text-xl font-bold hover:underline hover:text-color-primary  mr-2">Shedule</a></li>
+            </ul>
+            <ul class="lg:flex items-center space-x-2">
+                <li><a th:href="@{'/PointsTable?id=' + ${tournament.id}}" class="text-xl font-bold hover:underline hover:text-color-primary ease-in duration-200 mr-2">Points Table</a></li>
+            </ul>
+            <ul class="lg:flex items-center space-x-2">
+                <li><a th:href="@{'/Stats?id=' + ${tournament.id}}" class="text-xl font-bold  underline text-color-primary ease-in duration-200   mr-2">Stats</a></li>
+            </ul>
+        </nav>
+        <div>
+            <div class="bg-color-primary text-center text-color-white p-5">
+
+            <h1 class="text-xl font-bold ">Top Runs</h1>
+            </div>
+
+            <table class="w-full bg-gray-200 border-collapse  border border-black rounded-lg">
+                <thead>
+                <tr class="bg-gray-600 text-color-primary">
+                    <th class="px-4 py-2 border border-black">Player Name</th>
+                    <th class="px-4 py-2 border border-black">Total Runs</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Iterate over the top players for runs -->
+                <tr th:each="player : ${topRunScorers}">
+                    <td class="px-4 py-2 border border-black text-color-primary font-medium text-center" th:text="${player.name}">Player Name</td>
+                    <td class="px-4 py-2 border border-black text-color-primary font-medium text-center" th:text="${player.totalRuns}">Total Runs</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-8 mb-4">
+            <div class="bg-color-primary text-center text-color-white p-5">
+
+                <h1 class="text-xl font-bold ">Top Wickets</h1>
+            </div>
+            <table class="w-full bg-gray-200 border-collapse border border-black">
+                <thead>
+                <tr class="bg-gray-600 text-color-primary">
+                    <th class="px-4 py-2 border border-black">Player Name</th>
+                    <th class="px-4 py-2 border border-black">Total Wickets</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Iterate over the top players for wickets -->
+                <tr th:each="player : ${topWicketTakers}">
+                    <td class="px-4 py-2 border border-black text-center font-medium text-color-primary" th:text="${player.name}">Player Name</td>
+                    <td class="px-4 py-2 border border-black text-center font-medium text-color-primary" th:text="${player.totalWickets}">Total Wickets</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</section>
+</body>
+</html>

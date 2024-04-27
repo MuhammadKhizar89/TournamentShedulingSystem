@@ -1,72 +1,53 @@
 package com.TournamentShedulingSystem.TournamentManagement.TournamentOtherFiles;
-
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
 public class TournamentForm {
     public int getNoOfTeams() {
         return noOfTeams;
     }
-
     public void setNoOfTeams(int noOfTeams) {
         this.noOfTeams = noOfTeams;
     }
-
     public String getTournamentStartDate() {
         return tournamentStartDate;
     }
-
     public void setTournamentStartDate(String tournamentStartDate) {
         this.tournamentStartDate = tournamentStartDate;
     }
-
     public String getTournamentEndDate() {
         return tournamentEndDate;
     }
-
     public void setTournamentEndDate(String tournamentEndDate) {
         this.tournamentEndDate = tournamentEndDate;
     }
-
-    public String getTournamentDuration() {
+    public int getTournamentDuration() {
         return tournamentDuration;
     }
-
-    public void setTournamentDuration(String tournamentDuration) {
+    public void setTournamentDuration(int tournamentDuration) {
         this.tournamentDuration = tournamentDuration;
     }
-
     public String getNameOfTournament() {
         return nameOfTournament;
     }
-
     public void setNameOfTournament(String nameOfTournament) {
         this.nameOfTournament = nameOfTournament;
     }
-
     public int getNoOfVenues() {
         return noOfVenues;
     }
-
     public void setNoOfVenues(int noOfVenues) {
         this.noOfVenues = noOfVenues;
     }
-
     public int getNoOfUmpires() {
         return noOfUmpires;
     }
-
     public void setNoOfUmpires(int noOfUmpires) {
         this.noOfUmpires = noOfUmpires;
     }
-
     private int noOfTeams;
     private String tournamentStartDate;
     private String tournamentEndDate;
-    private String tournamentDuration;
+    private int tournamentDuration;
     private String nameOfTournament;
-
     public String getTypeOfTournament() {
         return typeOfTournament;
     }

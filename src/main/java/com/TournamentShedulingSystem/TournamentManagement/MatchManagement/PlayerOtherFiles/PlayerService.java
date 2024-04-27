@@ -1,9 +1,9 @@
 package com.TournamentShedulingSystem.TournamentManagement.MatchManagement.PlayerOtherFiles;
 import com.TournamentShedulingSystem.TournamentManagement.MatchManagement.Player;
+
 import java.util.List;
+
 public interface PlayerService {
-    List<Player> getAllPlayers();
-    Player getPlayerById(int id);
-    Player savePlayer(Player player);
-    void deletePlayer(int id);
+    Player addPlayerInfo(Player player);
+    List<Player> getPlayersInfo(int teamId);
 }

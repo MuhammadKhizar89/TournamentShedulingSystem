@@ -19,24 +19,13 @@
         <div>
             <ul class="hidden lg:flex items-center space-x-2">
                 <li><a href="/" class="hover:text-color-secondary ease-in duration-200 mr-2">Home</a></li>
-                <li><a href="tournament" class="hover:text-color-secondary ease-in duration-200 mr-2">View Schedules</a></li>
+                <li><a th:onclick="'window.location.href = \'/tournament?searchParam=&amp;searchCriteria=All\''"
+                       class="hover:text-color-secondary ease-in duration-200 mr-2">View Schedules</a></li>
                 <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="mytournaments"> Edit My Tournament</a></button></li>
-                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="tournamentnew"> Schedule Tournament</a></button></li>
+                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold opacity-80 ease-in duration-200"><a href="tournamentnew"> Schedule Tournament</a></button></li>
             </ul>
         </div>
 
-        <div id="hamburger" class="lg:hidden cursor-pointer z-50" th:onclick="|document.getElementById('menu').classList.toggle('hidden');document.querySelector('.fa-solid').classList.toggle('fa-xmark');document.getElementById('home').classList.toggle('hidden');|">
-            <i class="fa-solid fa-bars"></i>
-        </div>
-
-        <div id="menu" class="hidden lg:hidden bg-color-primary-dark h-[100vh] absolute inset-0">
-            <ul class="h-full grid place-items-center py-20">
-                <li ><a href="/" class="hover:text-color-secondary ease-in duration-200">Home</a></li>
-                <li><a href="tournament" class="hover:text-color-secondary ease-in duration-200">View Schedules</a></li>
-                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="mytournaments"> Edit My Tournament</a></button></li>
-                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="tournamentnew"> Schedule Tournament</a></button></li>
-            </ul>
-        </div>
     </nav>
 </header>
 <section class="bg-color-primary flex items-center justify-center">
@@ -49,7 +38,7 @@
             <form th:action="@{/tournamentnew}" th:object="${tournamentForm}" method="post" class="flex flex-col">
                 <!-- No of Teams -->
                 <label class="font-bold text-xl text-color-primary" for="noOfTeams">No of Teams</label>
-                <input required min="2" class="p-2 mt-2 mb-4 px-4 py-3 rounded-xl text-black border-2 border-color-primary" type="number" id="noOfTeams" th:field="*{noOfTeams}" placeholder="Number Of teams">
+                <input required min="4" class="p-2 mt-2 mb-4 px-4 py-3 rounded-xl text-black border-2 border-color-primary" type="number" id="noOfTeams" th:field="*{noOfTeams}" placeholder="Number Of teams">
 
                 <!-- Tournament Start Date -->
                 <label class="font-bold text-xl text-color-primary" for="tournamentStartDate">Tournament Start Date</label>
@@ -60,8 +49,8 @@
                 <input required class="p-2 mt-2 mb-4 px-4 py-3 rounded-xl text-black border-2 border-color-primary" type="date" id="tournamentEndDate" th:field="*{tournamentEndDate}" placeholder="Tournament End Date (Format: dd-MM-yy)">
 
                 <!-- Tournament Duration -->
-                <label class="font-bold text-xl text-color-primary" for="tournamentDuration">Match Duration</label>
-                <input required class="p-2 mt-2 mb-4 px-4 py-3 rounded-xl text-black border-2 border-color-primary" type="text" id="tournamentDuration" th:field="*{tournamentDuration}" placeholder="Tournament Duration">
+                <label class="font-bold text-xl text-color-primary" for="tournamentDuration">Match Overs</label>
+                <input required class="p-2 mt-2 mb-4 px-4 py-3 rounded-xl text-black border-2 border-color-primary" type="number" id="tournamentDuration" th:field="*{tournamentDuration}" placeholder="Tournament Duration">
 
                 <!-- Name of Tournament -->
                 <label class="font-bold text-xl text-color-primary" for="nameOfTournament">Name of Tournament</label>

@@ -14,22 +14,12 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public List<Player> getAllPlayers() {
-        return playerRepository.findAll();
-    }
-
-    @Override
-    public Player getPlayerById(int id) {
-        return playerRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public Player savePlayer(Player player) {
+    public Player addPlayerInfo(Player player) {
         return playerRepository.save(player);
     }
 
     @Override
-    public void deletePlayer(int id) {
-        playerRepository.deleteById(id);
+    public List<Player> getPlayersInfo(int teamId) {
+        return playerRepository.findByTeamId(teamId);
     }
 }

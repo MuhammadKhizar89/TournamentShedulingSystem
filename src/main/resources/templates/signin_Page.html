@@ -19,20 +19,8 @@
         <div>
             <ul class="hidden lg:flex items-center space-x-2">
                 <li><a href="/" class="hover:text-color-secondary ease-in duration-200 mr-2">Home</a></li>
-                <li><a href="tournament" class="hover:text-color-secondary ease-in duration-200 mr-2">View Schedules</a></li>
-                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="mytournaments"> Edit My Tournament</a></button></li>
-                <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="tournamentnew"> Schedule Tournament</a></button></li>
-            </ul>
-        </div>
-
-        <div id="hamburger" class="lg:hidden cursor-pointer z-50" th:onclick="|document.getElementById('menu').classList.toggle('hidden');document.querySelector('.fa-solid').classList.toggle('fa-xmark');document.getElementById('home').classList.toggle('hidden');|">
-            <i class="fa-solid fa-bars"></i>
-        </div>
-
-        <div id="menu" class="hidden lg:hidden bg-color-primary-dark h-[100vh] absolute inset-0">
-            <ul class="h-full grid place-items-center py-20">
-                <li ><a href="/" class="hover:text-color-secondary ease-in duration-200">Home</a></li>
-                <li><a href="tournament" class="hover:text-color-secondary ease-in duration-200">View Schedules</a></li>
+                <li><a th:onclick="'window.location.href = \'/tournament?searchParam=&amp;searchCriteria=All\''"
+                       class="hover:text-color-secondary ease-in duration-200 mr-2">View Schedules</a></li>
                 <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="mytournaments"> Edit My Tournament</a></button></li>
                 <li><button class="bg-color-secondary px-2 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"><a href="tournamentnew"> Schedule Tournament</a></button></li>
             </ul>

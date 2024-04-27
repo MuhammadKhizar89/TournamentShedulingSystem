@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <title>Shedule</title>
+</head>
+<body class="bg-color-primary text-color-white tracking-wider">
+<header>
+  <nav class="container flex justify-between items-center relative">
+    <div class="w-[44rem] py-5 text-color-secondary font-bold text-2xl">
+      <a href="/">
+        <div class="text-color-white">Tournament Scheduling</div>
+        System
+      </a>
+    </div>
+    <div>
+      <ul class="hidden lg:flex items-center space-x-2">
+        <li><a href="/" class="hover:text-color-secondary ease-in duration-200 mr-2">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<section class="bg-color-primary   mb-5 flex flex-col justify-center items-center">
+  <h2 class="font-bold text-2xl mb-4  pl-5 text-5xl text-center capitalize"  th:text="${tournament.nameOfTournament}"></h2>
+  <div class="bg-color-secondary rounded-lg border-black w-[80%] ">
+    <nav class="container w-[80%] mt-3 bg-color-secondary flex justify-between items-center relative ">
+      <ul class="lg:flex items-center space-x-2">
+        <li><a  th:href="@{'/viewTournament?id=' + ${tournament.id}}" class="text-xl font-bold underline text-color-primary mr-2">Shedule</a></li>
+      </ul>
+      <ul class="lg:flex items-center space-x-2">
+        <li><a th:href="@{'/PointsTable?id=' + ${tournament.id}}" class="text-xl font-bold hover:underline hover:text-color-primary ease-in duration-200 mr-2">Points Table</a></li>
+      </ul>
+      <ul class="lg:flex items-center space-x-2">
+        <li><a th:href="@{'/Stats?id=' + ${tournament.id}}" class="text-xl font-bold  hover:underline hover:text-color-primary ease-in duration-200 mr-2">Stats</a></li>
+      </ul>
+    </nav>
+    <div class="">
+      <div class="font-bold text-lg text-color-primary mb-4  pl-5  text-center capitalize" th:if="${lastScheduledMatch!= null}">
+        Tournament Winner: <span  th:text="${lastScheduledMatch}"></span>
+      </div>
+
+      <div th:each="match, matchNo : ${schedule.listOfTotalMatches}" class="border-black border-solid border-2 rounded-lg p-4 m-4 w-72 inline-block bg-color-primary hover:bg-opacity-80 ease-in duration-200">
+        <p class="text-xs">Match <span th:text="${matchNo.index + 1}"></span> out of <span th:text="${schedule.listOfTotalMatches.size()}"></span></p>
+        <div class="flex items-center text-lg font-bold">
+          <p class="mr-2" th:text="${match.team1}"></p>
+          <p class="mr-2">VS</p>
+          <p class="mr-2" th:text="${match.team2}"></p>
+        </div>
+        <p class="text-xs" th:text="'Date & Time: ' + ${formattedDates[matchNo.index]}"></p>
+        <p class="text-xs" th:text="'Venue: ' + ${match.venue}"></p>
+
+        <div th:if="${match.complete and match.won != 'tied'}">
+          <p class="text-xs" th:text="'Winner: ' + ${match.won}"></p>
+        </div>
+        <div th:if="${match.complete and match.won == 'tied'}">
+          <p class="text-xs" th:text="'Match has been tied'"></p>
+        </div>
+
+        <div th:if="${matchNo.index == schedule.listOfTotalMatches.size() - 2}">
+          <p class="font-bold text-color-secondary">Semi Final</p>
+        </div>
+
+        <!-- Check if match is third-to-last -->
+        <div th:if="${matchNo.index == schedule.listOfTotalMatches.size() - 3}">
+          <p class="font-bold text-color-secondary">Semi Final</p>
+        </div>
+
+        <!-- Check if match is last -->
+        <div th:if="${matchNo.index == schedule.listOfTotalMatches.size() - 1}">
+          <p class="text-xl font-bold text-color-secondary " >Final</p>
+        </div>
+
+
+        <button th:if="${match.complete}"
+                class="mt-8  text-center border-2 border-color-primary bg-green-500 px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"
+                th:onclick="'window.location.href = \'/ViewScoreCard?matchId=' + ${match.id} + '&tournamentId=' + ${tournament.id} + '\''">
+          View ScoreCard
+        </button>
+
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

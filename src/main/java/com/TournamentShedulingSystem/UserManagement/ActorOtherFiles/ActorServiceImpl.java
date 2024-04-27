@@ -1,7 +1,5 @@
-package com.TournamentShedulingSystem.UserManagement.ActorOtherFiles.service.impl;
+package com.TournamentShedulingSystem.UserManagement.ActorOtherFiles;
 import com.TournamentShedulingSystem.UserManagement.Actor;
-import com.TournamentShedulingSystem.UserManagement.ActorOtherFiles.repository.ActorRepository;
-import com.TournamentShedulingSystem.UserManagement.ActorOtherFiles.service.ActorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +49,9 @@ public class ActorServiceImpl implements ActorService {
     public Long getIdByUsernameAndPassword(String username, String password) {
         Optional<Actor> existingActor = actorRepository.findByUsernameAndPassword(username, password);
         return existingActor.map(Actor::getId).orElse(null);
+    }
+    @Override
+    public Actor findByid(Long id) {
+        return actorRepository.findByid(id);
     }
 }

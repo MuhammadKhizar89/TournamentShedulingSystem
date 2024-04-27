@@ -33,9 +33,26 @@ public class Tournament {
     private Date tournamentStartDate;
     @DateTimeFormat(pattern = "d-M-yy") // Format to display only the date in the pattern 2-3-44
     private Date tournamentEndDate;
-    private String tournamentDuration;
+    private int tournamentDuration;
     private String nameOfTournament;
     private String typeOfTournament;
+
+    public List<String> getVenues() {
+        List<String> venueNames = new ArrayList<>();
+        for (Venue venue : venues) {
+            venueNames.add(venue.getVenueName());
+        }
+        return venueNames;
+    }
+
+    public List<String> getUmpires() {
+        List<String> umpireNames = new ArrayList<>();
+        for (Umpire umpire : umpires) {
+            umpireNames.add(umpire.getUmpireName());
+        }
+        return umpireNames;
+    }
+
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL)
     private List<Venue> venues;
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL)
@@ -60,10 +77,10 @@ public class Tournament {
     public void setTournamentEndDate(Date tournamentEndDate) {
         this.tournamentEndDate = tournamentEndDate;
     }
-    public String getTournamentDuration() {
+    public int getTournamentDuration() {
         return tournamentDuration;
     }
-    public void setTournamentDuration(String tournamentDuration) {
+    public void setTournamentDuration(int tournamentDuration) {
         this.tournamentDuration = tournamentDuration;
     }
     public String getNameOfTournament() {
@@ -117,6 +134,7 @@ public class Tournament {
         }
         return teamNameIds;
     }
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -194,6 +212,26 @@ public static class Venue {
         @JoinColumn(name = "tournament_id")
         private Tournament tournament;
         private String teamName;
+
+        public int getPoints() {
+            return points;
+        }
+
+        public void setPoints(int points) {
+            this.points = points;
+        }
+
+        private int points;
+
+        public double getNetRunRate() {
+            return NetRunRate;
+        }
+
+        public void setNetRunRate(double netRunRate) {
+            NetRunRate = netRunRate;
+        }
+
+        private double NetRunRate;
         public Tournament getTournament() {
             return tournament;
         }

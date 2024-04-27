@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <title>Shedule</title>
+</head>
+<body class="bg-color-primary text-color-white tracking-wider">
+<button class="mt-4 ml-4 border-2 border-color-primary bg-green-500 px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200"
+        th:onclick="'window.location.href = \'/viewTournament?id=' + ${tournament.id} + '\''">
+    <-Back
+</button>
+
+<section class="bg-color-primary p-10  mb-5 flex flex-col justify-center items-center  ">
+    <div class="bg-color-secondary rounded-lg border-black w-[80%] ">
+        <div class="flex flex-col  ">
+            <h2 class="font-bold text-2xl border-black border-solid border-t-2 border-b-2 mb-4 pt-5 pl-5 text-color-primary text-center ">
+                ScoreCard</h2>
+            <!--            <hr>-->
+            <div th:if="${match.complete and match.won != 'tied'}">
+                <p class="font-bold text-color-primary text-center text-xm " th:text="'Winner: ' + ${match.won}"></p>
+            </div>
+            <div th:if="${match.complete and match.won == 'tied'}">
+                <p class="font-bold text-color-primary text-center text-xm " th:text="'Match has been tied'"></p>
+            </div>
+            <div class="flex justify-evenly  justify-center items-center m-10 c mt-5">
+                <p class="mr-2 text-2xl font-bold text-color-primary" th:text="${match.team1}"></p>
+                <div class="flex flex-col">
+                    <div class="flex">
+                        <p class="mr-2 text-lg font-bold text-color-primary underline"
+                           th:text="${scoreCard.team1Score}+'/'+${scoreCard.team1Wickets}"></p>
+                    </div>
+                    <div class="flex">
+                        <p class="mr-2 text-sm " th:text="${scoreCard.team1_Overs}+'/'+${scoreCard.TotalOvers}"></p>
+                    </div>
+                </div>
+                <p class="mr-2 text-color-primary text-2xl font-bold">VS</p>
+                <div class="flex flex-col">
+                    <div class="flex">
+                        <p class="mr-2 text-color-primary underline text-lg font-bold"
+                           th:text="${scoreCard.team2Score}+'/'+${scoreCard.team2Wickets}"></p>
+                    </div>
+                    <div class="flex">
+                        <p class="mr-2 text-sm " th:text="${scoreCard.team2_Overs}+'/'+${scoreCard.TotalOvers}"></p>
+                    </div>
+                </div>
+                <p class="mr-2 text-2xl font-bold text-color-primary" th:text="${match.team2}"></p>
+
+            </div>
+            <div class="flex justify-evenly border-black border-solid border-t-2 border-b-2   ">
+                <div class="flex flex-col bg-color-secondary w-full pt-3">
+                    <button th:text="${match.team1} + ' ScoreCard'"
+                            class="m-5 text-color-primary rounded-md text-xl capitalize font-bold hover:opacity-80 ease-in duration-200"></button>
+                    <table class="w-full border-collapse border border-black">
+                        <thead>
+                        <tr class="bg-color-primary text-color-white">
+                            <th class="px-2 py-1 border border-black">Name</th>
+                            <th class="px-2 py-1 border border-black">Runs</th>
+                            <th class="px-2 py-1 border border-black">Wickets</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="player : ${team1Players}">
+                            <td class="px-2 py-1 border border-black text-center" th:text="${player.name}">Player Name
+                            </td>
+                            <td class="px-2 py-1 border border-black text-center" th:text="${player.runs}">0</td>
+                            <td class="px-2 py-1 border border-black text-center" th:text="${player.wickets}">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="border-black border-solid border-2"></p>
+                <div class="flex flex-col bg-color-secondary w-full pt-3">
+                    <button th:text="${match.team2} + ' ScoreCard'"
+                            class="m-5 text-color-primary rounded-md text-xl capitalize font-bold hover:opacity-80 ease-in duration-200"></button>
+                    <table class="w-full border-collapse border border-black">
+                        <thead>
+                        <tr class="bg-color-primary text-color-white">
+                            <th class="px-2 py-1 border border-black">Name</th>
+                            <th class="px-2 py-1 border border-black">Runs</th>
+                            <th class="px-2 py-1 border border-black">Wickets</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="player : ${team2Players}">
+                            <td class="px-2 py-1 border border-black text-center" th:text="${player.name}">Player Name
+                            </td>
+                            <td class="px-2 py-1 border border-black text-center" th:text="${player.runs}">0</td>
+                            <td class="px-2 py-1 border border-black text-center" th:text="${player.wickets}">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="flex justify-evenly  text-color-primary font-bold m-5">
+                <p th:text="'Umpire: ' + ${match.umpire}"></p>
+                <p th:text="'Venue: ' + ${match.venue}"></p>
+            </div>
+            <div class="mb-4 mt-4 border-t-4 border-black">
+                <h2 class="font-bold text-2xl   text-color-primary text-center ">Match Highlight</h2>
+                <p class="font-bold text-color-primary text-center text-xm ">Note:If the video does not display immediately, please wait for a few moments</p>
+            </div>
+            <div class="flex flex-col p-5">
+                <video class="w-full rounded-lg" controls>
+                    <!-- MP4 format -->
+                    <source th:src="@{'/Highlights/' + ${match.id} + '.mp4'}" type="video/mp4">
+                    <!-- WebM format -->
+                    <source th:src="@{'/Highlights/' + ${match.id} + '.webm'}" type="video/webm">
+                    <!-- Ogg format -->
+                    <source th:src="@{'/Highlights/' + ${match.id} + '.ogg'}" type="video/ogg">
+                    <!-- MPEG format -->
+                    <source th:src="@{'/Highlights/' + ${match.id} + '.mpeg'}" type="video/mpeg">
+                    <!-- MOV format -->
+                    <source th:src="@{'/Highlights/' + ${match.id} + '.mov'}" type="video/quicktime">
+                    Your browser does not support the video tag.
+                </video>
+
+
+                <div class="w-full rounded-lg mt-3 p-10 py-2 mb-5 ">
+                    <form action="/submitComment" method="post">
+                        <input name="matchId" type="hidden" th:value="${match.id}">
+                        <input name="tournamentId" type="hidden" th:value="${tournament.id}">
+                        <div class="w-full rounded-lg mt-3 p-10 py-2 mb-5 flex">
+                        <input name="comment" class="bg-color-primary mr-2 rounded-lg text-white  p-5 m-3 w-full"
+                               type="text" placeholder="Add A Comment">
+                        <button type="submit" class="border-2 border-color-primary bg-green-500 px-4 py-3 rounded-md">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <p class="text-2xl font-bold p-2 text-color-primary">Comments:</p>
+            <div class="">
+                <hr>
+                <div th:if="${comments.empty}" class="font-bold text-color-primary text-center">
+                    <p>No comments yet.</p>
+                </div>
+                <div class="flex p-5 m-3 text-color-primary" th:each="comment, commentIndex : ${comments}" th:object="${commentUsers[commentIndex.index]}">
+                    <i class="fa-solid fa-user"></i>
+                    <div class="flex flex-col">
+                    <p class="text-xs  font-bold" th:text="${commentUsers[commentIndex.index].username}"></p>
+                    <p class="text-lg " th:text="${comment.comment}"></p>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+</body>
+</html>
