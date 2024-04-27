@@ -601,6 +601,7 @@ if(schedule.getListOfTotalMatches().size()==0)
 {
     return "error1";
 }
+int d;
         Optional<Tournament> optionalTournament = tservice.getTournamentInfo(id);
         if (!optionalTournament.isPresent()) {
             return "error1"; // Or handle the absence of tournament data appropriately
