@@ -597,7 +597,10 @@ public class TournamentController {
     public String editTournament(@RequestParam("id") int id, HttpServletRequest request, Model model) {
         Schedule schedule = new Schedule();
         scheduleService.populateAllMatchesByTournamentid(schedule, id);
-
+if(schedule.getListOfTotalMatches().size()==0)
+{
+    return "error1";
+}
         Optional<Tournament> optionalTournament = tservice.getTournamentInfo(id);
         if (!optionalTournament.isPresent()) {
             return "error1"; // Or handle the absence of tournament data appropriately
