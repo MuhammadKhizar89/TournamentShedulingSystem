@@ -27,11 +27,16 @@
     <div class="bg-color-secondary p-2 rounded-lg border-2 border-black flex">
         <div class=" px-8">
             <h2 class="font-bold text-2xl mb-4 text-color-primary">Tournament Info</h2>
-            <div class="flex flex-col items-center">
-                <a href="/tournamentnew3" class="bg-color-primary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200 mb-3">Back</a>
-                <button class="border-2 border-color-primary bg-green-500 px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200 mb-3" th:click="|window.location.href='/generate-manual'|">Generate Schedule Manually</button>
-                <button class="border-2 border-color-primary bg-green-500 px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200" th:click="|window.location.href='/schedule1'|">Generate Schedule Automatically</button>
-            </div>
+            <form th:action="@{/schedule1}" method="post">
+                <div class="flex flex-col items-center">
+                    <button type="submit" class="border-2 border-color-primary bg-green-500 px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200 mb-3">Generate Schedule Automatically</button>
+                </div>
+            </form>
+            <form th:action="@{/schedule2}" method="post">
+                <div class="flex flex-col items-center">
+                    <button type="submit" class="border-2 border-color-primary bg-green-500 px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200 mb-3">Generate Schedule Manually</button>
+                </div>
+            </form>
         </div>
     </div>
 </section>
