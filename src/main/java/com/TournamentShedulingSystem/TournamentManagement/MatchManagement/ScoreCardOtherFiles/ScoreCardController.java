@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -106,7 +105,6 @@ public class ScoreCardController {
                     team2Wickets = team2Wickets + Integer.parseInt(value);
                 }
                 x++;
-
             }
         }
         Optional<Tournament> optionalTournament = tservice.getTournamentInfo(tournamentId);
@@ -159,10 +157,8 @@ public class ScoreCardController {
             playerService.addPlayerInfo(player);
             i++;
         }
-
-// Prepare the SQL UPDATE statement
+        // Prepare the SQL UPDATE statement
         String sqlUpdate = "UPDATE PlayerStats SET runs = ?, wickets = ? WHERE playerId = ? AND matchId = ?";
-
         try (Connection connection = dataSource.getConnection()) {
             // Update team 1 players
             try (PreparedStatement statement1 = connection.prepareStatement(sqlUpdate)) {
@@ -186,10 +182,7 @@ public class ScoreCardController {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle SQL exception
         }
-
-
         String sqlInsert = "INSERT INTO score_card (total_overs, matchid, team1score,team1wickets , team1_overs, team2score, team2wickets, team2_overs) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE " +
@@ -203,8 +196,6 @@ public class ScoreCardController {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sqlInsert)) {
-
-            // Set parameters for the prepared statement
             statement.setInt(1, tournament.getTournamentDuration());  // total_overs
             statement.setInt(2, matchId);                              // matchid
             statement.setInt(3, team1Runs);                            // team1score
@@ -213,20 +204,15 @@ public class ScoreCardController {
             statement.setInt(6, team2Runs);                            // team2score
             statement.setInt(7, team1Wickets);                         // team2wickets
             statement.setFloat(8, team2Overs);                         // team2_overs
-
             // Execute the INSERT statement
             statement.executeUpdate();
-
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle SQL exception
         }
-
         Schedule schedule = new Schedule();
         scheduleService.populateAllMatchesByTournamentid(schedule, tournamentId);
         int lastMatchIndex = schedule.getListOfTotalMatches().size() - 1;
         boolean isLastThreeMatches = false;
-
         for (int ki = lastMatchIndex; ki >= Math.max(0, lastMatchIndex - 2); ki--) {
             if (matchId == schedule.getListOfTotalMatches().get(ki).getId()) {
                 isLastThreeMatches = true;
@@ -240,11 +226,9 @@ public class ScoreCardController {
         double nrr1 = (teamnnr1 - teamnnr10);
         double nrr2 = (teamnnr2 - teamnnr20);
         boolean isLastMatch = false;
-
         if (matchId == schedule.getListOfTotalMatches().get(lastMatchIndex).getId()) {
             isLastMatch = true;
         }
-
         String sqlUpdate2 = "UPDATE matches SET complete = 1, won = ? WHERE id = ?";
         String won;
         if (team1Runs > team2Runs) {
@@ -273,25 +257,18 @@ public class ScoreCardController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
         String sqlUpdate1 = "UPDATE matches SET complete = 1 WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sqlUpdate1)) {
             // Set parameter for the prepared statement
             statement.setInt(1, matchId);  // matchId
-
             // Execute the UPDATE statement
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle SQL exception
         }
-
-
         int points1 = 0;
         int points2 = 0;
-
         if (Objects.equals(won, match.getTeam1())) {
             points1 = 2;
         } else if (Objects.equals(won, match.getTeam2())) {
@@ -300,7 +277,6 @@ public class ScoreCardController {
             points1 = 1;
             points2 = 1;
         }
-
         boolean isSecondLastMatch = false;
         int secondLastMatchIndex = Math.max(0, lastMatchIndex - 1);
         for (int ki = lastMatchIndex; ki >= Math.max(0, lastMatchIndex - 2); ki--) {
@@ -313,53 +289,34 @@ public class ScoreCardController {
         }
         lastMatchIndex = schedule.getListOfTotalMatches().size() - 1;
         if (isSecondLastMatch) {
-
             Match thirdLastMatch = schedule.getListOfTotalMatches().get(lastMatchIndex - 2);
             Match secondLastMatch = schedule.getListOfTotalMatches().get(lastMatchIndex - 1);
             Match lastMatch = schedule.getListOfTotalMatches().get(lastMatchIndex);
-
-            // Debugging output
-            System.out.println("Third Last Match: " + thirdLastMatch);
-            System.out.println("Second Last Match: " + secondLastMatch);
-            System.out.println("Last Match: " + lastMatch);
-
             // Determine the winning teams for the third last and second last matches
             int winningTeam3rdLast = 0;
             int winningTeam2ndLast = 0;
             secondLastMatch.setWon(won);
-
             if (thirdLastMatch.getWon().equals(thirdLastMatch.getTeam1())) {
                 winningTeam3rdLast = thirdLastMatch.getTeam1id();
             } else if (thirdLastMatch.getWon().equals(thirdLastMatch.getTeam2())) {
                 winningTeam3rdLast = thirdLastMatch.getTeam2id();
             }
-
             if (secondLastMatch.getWon().equals(secondLastMatch.getTeam1())) {
                 winningTeam2ndLast = secondLastMatch.getTeam1id();
             } else if (secondLastMatch.getWon().equals(secondLastMatch.getTeam2())) {
                 winningTeam2ndLast = secondLastMatch.getTeam2id();
             }
-
-            // Debugging output
-            System.out.println("Winning Team 3rd Last: " + winningTeam3rdLast);
-            System.out.println("Winning Team 2nd Last: " + winningTeam2ndLast);
-
             updateMatch2(winningTeam3rdLast, thirdLastMatch.getWon(),
                     winningTeam2ndLast, secondLastMatch.getWon(),
                     lastMatch.getId());
-
             storePlayerStats(lastMatch.getId(), winningTeam3rdLast, winningTeam2ndLast, tournamentId);
         }
-
-
         if (isLastThreeMatches) {
             nrr1 = 0;
             nrr2 = 0;
             points1 = 0;
             points2 = 0;
         }
-
-
         // Update for Team 1
         String sqlUpdateTeam1 = "UPDATE team_name SET points = points + ?, net_run_rate =net_run_rate+ ? WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
@@ -368,15 +325,12 @@ public class ScoreCardController {
             statement.setInt(1, points1);   // points for Team 1
             statement.setDouble(2, nrr1);   // net run rate for Team 1
             statement.setInt(3, match.getTeam1id());  // team2Id
-
             // Execute the UPDATE statement
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle SQL exception
         }
-
-// Update for Team 2
+        // Update for Team 2
         String sqlUpdateTeam2 = "UPDATE team_name SET points = points + ?, net_run_rate =net_run_rate+ ? WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sqlUpdateTeam2)) {
@@ -384,25 +338,12 @@ public class ScoreCardController {
             statement.setInt(1, points2);   // points for Team 2
             statement.setDouble(2, nrr2);   // net run rate for Team 2
             statement.setInt(3, match.getTeam2id());  // team2Id
-
-            // Execute the UPDATE statement
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle SQL exception
         }
-
-
-        System.out.println("Team1Points" + points1);
-        System.out.println("Team2Points" + points2);
-        System.out.println("Team1Overs" + team1Overs);
-        System.out.println("Team2Overs" + team2Overs);
-        System.out.println("Team1Score" + team1Runs + " / " + team1Wickets);
-        System.out.println("Team1Score" + team2Runs + " / " + team2Wickets);
-
         return "redirect:/editShedule1?id=" + tournamentId;
-
-    }
+}
 
     private String getFileExtension(String fileName) {
         int dotIndex = fileName.lastIndexOf('.');
@@ -415,39 +356,29 @@ public class ScoreCardController {
         String sqlUpdateMatch = "UPDATE matches " +
                 "SET team1id = ?, team1 = ?, team2id = ?, team2 = ? " +
                 "WHERE id = ?";
-
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sqlUpdateMatch)) {
-
             statement.setInt(1, team1Id);
             statement.setString(2, team1Name);
             statement.setInt(3, team2Id);
             statement.setString(4, team2Name);
             statement.setInt(5, matchIndex);
             statement.executeUpdate();
-
         } catch (SQLException e) {
             e.printStackTrace(); // Log or handle the exception appropriately
         }
     }
-
-
-
     private void storePlayerStats(int matchId, int team1Id, int team2Id, int tournamentId) {
         List<Player> team1Players = playerService.getPlayersInfo(team1Id);
         List<Player> team2Players = playerService.getPlayersInfo(team2Id);
-
         for (Player player : team1Players) {
             String insertQuery = "INSERT INTO PlayerStats (matchId, playerId, runs, wickets) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(insertQuery, matchId, player.getId(), 0, 0);
         }
-
         for (Player player : team2Players) {
             String insertQuery = "INSERT INTO PlayerStats (matchId, playerId, runs, wickets) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(insertQuery, matchId, player.getId(), 0, 0);
         }
-        System.out.println(team1Players);
-        System.out.println(team2Players);
     }
     @GetMapping("/ViewScoreCard")
     public String displayScoreCard(@RequestParam("matchId") int matchId,
@@ -455,6 +386,9 @@ public class ScoreCardController {
                                    Model model) {
         Match match = matchService.getMatchInfo(matchId);
         Optional<Tournament> optionalTournament = tservice.getTournamentInfo(tournamentId);
+        if (!optionalTournament.isPresent()) {
+            return "error1";
+        }
         Tournament tournament = optionalTournament.get();
         ScoreCard scoreCard = scoreCardService.getScoreCardInfo(matchId);
         List<Player> team1Players = playerService.getPlayersInfo(match.getTeam1id());
@@ -471,7 +405,6 @@ public class ScoreCardController {
             }
         }
         team1Query += ")";
-
         // SQL query to get runs and wickets for team 2 players
         String team2Query = "SELECT runs, wickets FROM PlayerStats WHERE matchId = ? AND playerId IN (";
         for (int i = 0; i < team2Players.size(); i++) {
@@ -483,7 +416,6 @@ public class ScoreCardController {
         team2Query += ")";
         List<Map<String, Object>> team1Stats = jdbcTemplate.queryForList(team1Query, matchId);
         List<Map<String, Object>> team2Stats = jdbcTemplate.queryForList(team2Query, matchId);
-
 // Update team1Players with runs and wickets data
         for (int i = 0; i < team1Players.size(); i++) {
             Map<String, Object> playerStats = team1Stats.get(i);
@@ -493,7 +425,6 @@ public class ScoreCardController {
             team1Players.get(i).setRuns(runs);
             team1Players.get(i).setWickets(wickets);
         }
-
 // Update team2Players with runs and wickets data
         for (int i = 0; i < team2Players.size(); i++) {
             Map<String, Object> playerStats = team2Stats.get(i);
@@ -502,25 +433,14 @@ public class ScoreCardController {
             team2Players.get(i).setRuns(runs);
             team2Players.get(i).setWickets(wickets);
         }
-        System.out.println("Match: " + match);
-        System.out.println("Tournament: " + tournament);
-        System.out.println("Score Card: " + scoreCard);
-        System.out.println("Team 1 Players: " + team1Players);
-        System.out.println("Team 2 Players: " + team2Players);
-
         List<Comments> comments = commentsService.getComments(match.getId());
-
-// Create a list to hold the user details for each comment
         List<Actor> commentUsers = new ArrayList<>();
-
 // Iterate through each comment to fetch the user details
         for (Comments comment : comments) {
             long userId = (long) comment.getUserid();
             Actor user = actorService.findByid(userId);
             commentUsers.add(user);
         }
-
-// Add the comments and corresponding user details to the model
         model.addAttribute("comments", comments);
         model.addAttribute("commentUsers", commentUsers);
         model.addAttribute("match", match);
@@ -530,5 +450,4 @@ public class ScoreCardController {
         model.addAttribute("team2Players", team2Players);
         return "viewScoreCard1";
     }
-
 }

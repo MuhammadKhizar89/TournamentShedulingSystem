@@ -44,30 +44,24 @@ public class MatchController {
         this.commentsService = commentsService;
         this.actorService = actorService;
     }
-
     @PostMapping("/submitComment")
     public String addComment(@RequestParam("matchId") int matchId,
                                 @RequestParam("tournamentId") int tournamentId,
                                 @RequestParam("comment") String comment,
                                 Model model,
                                 HttpServletRequest request) { // Add HttpServletRequest parameter
-        // Get the userId from the session
         if (request.getSession().getAttribute("userId") != null) {
             Long userId = (Long) request.getSession().getAttribute("userId");
-            // Create a new Comments object
             Comments newComment = new Comments();
             newComment.setMatchId(matchId);
             newComment.setComment(comment);
             newComment.setUserid(userId);
             commentsService.addComment(newComment);
-
         } else {
             return "signup_Page";
         }
-        // Redirect back to the same page with the matchId and tournamentId parameters
         return "redirect:/ViewScoreCard?matchId=" + matchId + "&tournamentId=" + tournamentId;
     }
-
     private void editMatch(int team1Id, String team1Name, int team2Id, String team2Name, int matchIndex) {
         String sqlUpdateMatch = "UPDATE matches " +
                 "SET team1id = ?, team1 = ?, team2id = ?, team2 = ? " +
@@ -75,19 +69,14 @@ public class MatchController {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sqlUpdateMatch)) {
-
             statement.setInt(1, team1Id);
             statement.setString(2, team1Name);
             statement.setInt(3, team2Id);
             statement.setString(4, team2Name);
             statement.setInt(5, matchIndex);
             statement.executeUpdate();
-
         } catch (SQLException e) {
             e.printStackTrace(); // Log or handle the exception appropriately
         }
     }
-
-
-
 }

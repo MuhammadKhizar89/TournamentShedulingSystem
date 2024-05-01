@@ -1,4 +1,6 @@
 package com.TournamentShedulingSystem.TournamentManagement.TournamentOtherFiles;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.TournamentShedulingSystem.TournamentManagement.MatchManagement.Comments;
 import com.TournamentShedulingSystem.TournamentManagement.MatchManagement.CommentsOtherFiles.CommentsService;
 import com.TournamentShedulingSystem.UserManagement.ActorOtherFiles.ActorService;
@@ -17,10 +19,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -29,10 +27,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
 @Controller
 public class TournamentController {
     private TournamentService tservice;
@@ -47,7 +47,6 @@ public class TournamentController {
     private DataSource dataSource;
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
     @Autowired
     public TournamentController(TournamentService tservice, PlayerService playerService, MatchService matchService, ScheduleService scheduleService, ScoreCardService scoreCardService, TeamNameRepository teamNameRepository, CommentsService commentsService, ActorService actorService) {
         this.tservice = tservice;
@@ -59,7 +58,6 @@ public class TournamentController {
         this.commentsService = commentsService;
         this.actorService = actorService;
     }
-
     @GetMapping("/")
     public String index(HttpServletRequest request, Model model) {
         if (request.getSession().getAttribute("username") != null) {
@@ -100,7 +98,6 @@ public class TournamentController {
         return filteredTournaments;
     }
 
-    //    tournaments = tservice.findAllTournaments();
     @GetMapping("/tournament")
     public String listTournament(Model model, @RequestParam(required = false) String searchCriteria, HttpServletRequest request) {
         if (searchCriteria != null) {
@@ -181,80 +178,36 @@ public class TournamentController {
             return null;
         }
     }
-
-//    @GetMapping("/tournament")
-//    public String listTournament(Model model, @RequestParam(required = false) String searchCriteria) {
-//        List<Tournament> tournaments;
-//
-//        if (searchCriteria != null && !searchCriteria.isEmpty()) {
-//            switch (searchCriteria) {
-//                case "Team":
-//                    // Handle search by team name
-//          tournaments = tservice.findTournamentsByTeamName("TeamName");
-//                    break;
-//                case "Date":
-//                    // Handle search by date
-//          tournaments = tservice.findTournamentsByDate(date);
-//                    break;
-//                case "Teams":
-//                    // Handle search by number of teams
-//                     Example: tournaments = tservice.findTournamentsByNoOfTeams(4);
-//                    break;
-//                case "Keyword":
-//                    // Handle search by keyword
-//                     Example: tournaments = tservice.findTournamentsByKeyword("Keyword");
-//                    break;
-//                default:
-//                    // Default behavior
-//                    tournaments = tservice.findAllTournaments();
-//                    break;
-//            }
-//        } else {
-//
-//            tournaments = tservice.findAllTournaments();
-//        }
-////        for (Tournament tournament : tournaments) {
-////            System.out.println("Tournament ID: " + tournament.getId());
-////            System.out.println("Tournament Name: " + tournament.getNameOfTournament());
-////            System.out.println("Number of Teams: " + tournament.getNoOfTeams());
-////            System.out.println("Tournament Duration: " + tournament.getTournamentDuration());
-////            System.out.println("Tournament Start Date: " + tournament.getTournamentStartDate());
-////            System.out.println("Tournament End Date: " + tournament.getTournamentEndDate());
-////            System.out.println("Type of Tournament: " + tournament.getTypeOfTournament());
-////            System.out.println("---------------------------------------------");
-////        }
-//        model.addAttribute("tournament", tournaments);
-//        return "Tournament-list";
-//    }
-
     @GetMapping("/tournamentnew")
     public String createTournament(Model model, HttpServletRequest request) {
-        // Check if the user is authenticated before allowing access to the page
         if (request.getSession().getAttribute("userId") == null) {
             return "redirect:/signup";
         } else {
-
             model.addAttribute("tournamentForm", new TournamentForm());
             return "CreatingTournament/creating-Tournament";
         }
     }
 
-    @PostMapping("/tournamentnew")
-    public String processTournamentForm(@ModelAttribute("tournamentForm") TournamentForm tournamentForm, HttpSession session, HttpServletRequest request) {
-        // Set the tournamentForm object in the session
-        session.setAttribute("tournamentForm", tournamentForm);
-//        System.out.println(request.getSession().getAttribute("userId"));
-        // Print the form data
-        System.out.println("No of teams: " + tournamentForm.getNoOfTeams());
-        System.out.println("Tournament Start Date: " + tournamentForm.getTournamentStartDate());
-        System.out.println("Tournament End Date: " + tournamentForm.getTournamentEndDate());
-        System.out.println("Tournament Duration: " + tournamentForm.getTournamentDuration());
-        System.out.println("Name of Tournament: " + tournamentForm.getNameOfTournament());
-        System.out.println("No of Venues: " + tournamentForm.getNoOfVenues());
-        System.out.println("No of Umpires: " + tournamentForm.getNoOfUmpires());
 
-        // Redirect to the next form
-        return "redirect:/tournament2";
+    @PostMapping("/tournamentnew")
+    public String processTournamentForm(@ModelAttribute("tournamentForm") TournamentForm tournamentForm, HttpSession session, HttpServletRequest request, RedirectAttributes redirectAttributes, Model model) {
+        try {
+            // Parse start and end dates
+            LocalDate startDate = LocalDate.parse(tournamentForm.getTournamentStartDate());
+            LocalDate endDate = LocalDate.parse(tournamentForm.getTournamentEndDate());
+
+            // Check if end date is before start date
+            if (endDate.isBefore(startDate)) {
+                redirectAttributes.addFlashAttribute("error", "End date cannot be before start date.");
+                return "redirect:/tournamentnew"; // Return to the form page with an error message
+            }
+        } catch (DateTimeParseException e) {
+            redirectAttributes.addFlashAttribute("error", "Invalid date format.");
+            return "redirect:/tournamentnew"; // Return to the form page with an error message for invalid date format
+        }
+
+        session.setAttribute("tournamentForm", tournamentForm);
+        return "redirect:/tournament2"; // Redirect to the next step
     }
 
     @GetMapping("/tournament2")
@@ -264,47 +217,13 @@ public class TournamentController {
             // Redirect to the first form if no data is available
             return "redirect:/tournamentnew";
         }
-//
-//        // Check if tournamentForm.noOfTeams is a power of 4
-//        if (isPowerOfFour(tournamentForm.getNoOfTeams()) && isPowerOfTwo(tournamentForm.getNoOfTeams())) {
-//            model.addAttribute("tournamentForm", tournamentForm);
-//            return "CreatingTournament/creating-Tournament3";
-//        } else if (isPowerOfFour(tournamentForm.getNoOfTeams())) {
-//            model.addAttribute("tournamentForm", tournamentForm);
-//            return "CreatingTournament/creating-Tournament1";
-//        } else if (isPowerOfTwo(tournamentForm.getNoOfTeams())) {
-//            model.addAttribute("tournamentForm", tournamentForm);
-//            return "CreatingTournament/creating-Tournament2";
-//        } else {
         model.addAttribute("tournamentForm", tournamentForm);
         return "CreatingTournament/creating-Tournament4";
-//        }
     }
-
-//    private boolean isPowerOfFour(Integer number) {
-//        if (number == null || number <= 0) {
-//            return false;
-//        }
-//        // Calculate the logarithm base 4 of the number
-//        double logResult = Math.log(number) / Math.log(4);
-//        // Check if the result is an integer
-//        return Math.floor(logResult) == logResult;
-//    }
-//
-//    private boolean isPowerOfTwo(Integer number) {
-//        if (number == null || number <= 0) {
-//            return false;
-//        }
-//        // Calculate the logarithm base 2 of the number
-//        double logResult = Math.log(number) / Math.log(2);
-//        // Check if the result is an integer
-//        return Math.floor(logResult) == logResult;
-//    }
 
     @PostMapping("/tournament2")
     public String OrganizeTournament(@ModelAttribute("tournamentForm") TournamentForm tournamentForm, HttpSession session, HttpServletRequest request, Model model) {
         Long userId = (Long) request.getSession().getAttribute("userId"); // Get userId from session
-
         // Parse tournament start date
         Date tournamentStartDate = null;
         try {
@@ -313,7 +232,6 @@ public class TournamentController {
             e.printStackTrace();
             return "error-page"; // Handle parsing exception
         }
-
         // Parse tournament end date
         Date tournamentEndDate = null;
         try {
@@ -322,7 +240,6 @@ public class TournamentController {
             e.printStackTrace();
             return "error-page"; // Handle parsing exception
         }
-
         // Create a new Tournament object
         Tournament tournament = new Tournament();
         // Set tournament attributes
@@ -337,7 +254,6 @@ public class TournamentController {
         List<Tournament.Venue> venues = new ArrayList<>();
         List<Tournament.Umpire> umpires = new ArrayList<>();
         List<Tournament.TeamName> teamNames = new ArrayList<>();
-
         // Populate venues
         for (String venueName : tournamentForm.getVenueList()) {
             Tournament.Venue venue = new Tournament.Venue();
@@ -345,7 +261,6 @@ public class TournamentController {
             venue.setTournament(tournament);
             venues.add(venue);
         }
-
         // Populate umpires
         for (String umpireName : tournamentForm.getUmpireList()) {
             Tournament.Umpire umpire = new Tournament.Umpire();
@@ -353,7 +268,6 @@ public class TournamentController {
             umpire.setTournament(tournament);
             umpires.add(umpire);
         }
-
         // Populate team names
         for (String teamName : tournamentForm.getTeamNames()) {
             Tournament.TeamName teamNameObject = new Tournament.TeamName();
@@ -363,12 +277,10 @@ public class TournamentController {
             teamNameObject.setNetRunRate(0.0);
             teamNames.add(teamNameObject);
         }
-
         // Set the lists of venues, umpires, and team names to the tournament
         tournament.setVenues(venues);
         tournament.setUmpires(umpires);
         tournament.setTeamNames(teamNames);
-
         // Save the tournament along with its associated entities
         tservice.OrganizeTournament(tournament);
         session.setAttribute("tournament", tournament);
@@ -379,14 +291,15 @@ public class TournamentController {
     public String showTournament3Form(HttpSession session, Model model) {
         // Retrieve the Tournament object from the session
         Tournament tournament = (Tournament) session.getAttribute("tournament");
-
         // Check if the tournament object is not null
         if (tournament != null) {
             System.out.println("No of teams: " + tournament.getNoOfTeams());
             System.out.println("Tournament Start Date: " + tournament.getTournamentStartDate());
             System.out.println("Tournament Name: " + tournament.getTeamNames());
         }
-
+        else {
+            return "error1";
+        }
         model.addAttribute("tournament", tournament);
         return "CreatingTournament/creating-Tournament5";
     }
@@ -415,16 +328,282 @@ public class TournamentController {
                 player.setTotalWickets(0);
                 playerService.addPlayerInfo(player);
                 count++;
-
             }
         }
         model.addAttribute("tournament", tournament);
         return "ShedulingTournament/ShedulingTournament1";
     }
 
+//    @PostMapping("/confirmSchedule")
+//    public String confirmSchedule(@RequestParam List<Match> matches, Model model, @SessionAttribute("tournament") Tournament tournament) {
+//        if (tournament == null) {
+//            model.addAttribute("error", "Tournament details not found in session");
+//            return "redirect:/schedule2"; // You need to create an error page
+//        }
+//        LocalDateTime currentDate = LocalDateTime.now();
+//        LocalDateTime tournamentStartDate = tournament.getTournamentStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+//        LocalDateTime tournamentEndDate = tournament.getTournamentEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+//        // Check if current date is within tournament start and end dates
+//        if (currentDate.isBefore(tournamentStartDate) || currentDate.isAfter(tournamentEndDate)) {
+//            model.addAttribute("error", "Current date is not within tournament start and end dates");
+//            return "redirect:/schedule2"; // You need to create an error page
+//        }
+//        // Check each match date against tournament start and end dates
+//        for (Match match : matches) {
+//            LocalDateTime matchDateTime = match.getMatchDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+//            if (matchDateTime.isBefore(tournamentStartDate) || matchDateTime.isAfter(tournamentEndDate)) {
+//                model.addAttribute("error", "Match date is not within tournament start and end dates");
+//                return "redirect:/schedule2"; // You need to create an error page
+//            }
+//        }
+//
+//        return "redirect:/"; // You need to create a confirmation page
+//    }
+//@PostMapping("/confirmSchedule")
+//public String confirmSchedule(HttpServletRequest request, Model model) {
+//    List<Match> matches = new ArrayList<>();
+//
+//    // Retrieve the number of matches from the request parameter
+//    int numberOfMatches = Integer.parseInt(request.getParameter("numberOfMatches"));
+//    // Iterate through each match to retrieve umpire, venue, and match time
+//    // Inside your controller method
+//    for (int i = 0; i < numberOfMatches; i++) {
+//        // Retrieve umpire, venue, and match time from request parameters
+//        String umpire = request.getParameter("umpire" + i);
+//        String venue = request.getParameter("venue" + i);
+//        String matchTimeStr = request.getParameter("matchTime" + i);
+//
+//        // Convert match time String to Date
+//        Date matchTime;
+//        try {
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+//            matchTime = dateFormat.parse(matchTimeStr);
+//        } catch (ParseException e) {
+//            e.printStackTrace(); // Handle parsing exception
+//            // Set matchTime to null or some default value if parsing fails
+//            matchTime = null;
+//        }
+//        // Create a new Match object and set umpire, venue, and match time
+//        Match match = new Match();
+//        match.setUmpire(umpire);
+//        match.setVenue(venue);
+//        match.setMatchDate(matchTime);
+//        // Add the match to the list of matches
+//        matches.add(match);
+//    }
+//    // Print all matches along with their corresponding umpire, venue, and match time
+//    for (Match match : matches) {
+//        System.out.println("Match: " + match.getTeam1() + " vs " + match.getTeam2());
+//        System.out.println("Umpire: " + match.getUmpire());
+//        System.out.println("Venue: " + match.getVenue());
+//        System.out.println("Match Time: " + match.getMatchDate());
+//        System.out.println();
+//    }
+//
+//    model.addAttribute("matches", matches);
+//
+//    return "confirmationPage";
+//}
+
+//    @PostMapping("/confirmSchedule")
+//    public String confirmSchedule(HttpServletRequest request,HttpSession session,
+//                                  Model model) {
+//        Tournament tournament = (Tournament) session.getAttribute("tournament");
+//        List<Match> allMatches  = (List<Match>) session.getAttribute("allMatches");
+//        Enumeration<String> parameterNames = request.getParameterNames();
+//        while (parameterNames.hasMoreElements()) {
+//            String paramName = parameterNames.nextElement();
+//            String[] paramValues = request.getParameterValues(paramName);
+//            for (String value : paramValues) {
+//                System.out.println("Parameter: " + paramName + ", Value: " + value);
+//            }
+//        }
+//        return "confirmation-page"; // Return the name of the confirmation page
+//    }
+@PostMapping("/confirmSchedule")
+public String confirmSchedule(HttpServletRequest request, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+    Tournament tournament = (Tournament) session.getAttribute("tournament");
+    List<String> umpires = new ArrayList<>();
+    List<String> venues = new ArrayList<>();
+    List<Date> date1 = new ArrayList<>();
+    List<Match> allMatches = (List<Match>) session.getAttribute("allMatches");
+    if (tournament == null || allMatches == null) {
+        return "error1";
+    }
+    int x=(allMatches.size()*3)+2;
+    System.out.println("------->"+x);
+    int y=1;
+    int index=0;
+    int u=allMatches.size()+2;
+    int v=allMatches.size()*2+2;
+    Enumeration<String> parameterNames = request.getParameterNames();
+    while (parameterNames.hasMoreElements()) {
+        String paramName = parameterNames.nextElement();
+        String[] paramValues = request.getParameterValues(paramName);
+        for (String value : paramValues) {
+            System.out.println("Parameter: " + paramName + ", Value: " + value);
+            y++;
+            if (y>x) {
+                try {
+                    System.out.println("Parameter1111111111");
+                    Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(value);
+                    if (!isValidTournamentDate(date, tournament)) {
+                        redirectAttributes.addFlashAttribute("error", "Date should be within the tournament start and end dates.");
+                        return "redirect:/schedule2"; // Return error page
+                    }
+//                    allMatches.get(index).setMatchDate(date);
+                    date1.add(date);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if(y>u&&y<=v)
+            {
+                venues.add(value);
+            }
+            else if(y>v&&y<=x)
+            {
+                umpires.add(value);
+            }
+        }
+    }
+    int size = date1.size();
+    if (size >= 3) {
+        Date lastDate = date1.get(size - 1);
+        Date secondLastDate = date1.get(size - 2);
+        Date thirdLastDate = date1.get(size - 3);
+        if (lastDate.after(secondLastDate) && (secondLastDate.after(thirdLastDate)) || secondLastDate.equals(thirdLastDate)) {
+            boolean lastThreeAfterAllMatches = true;
+            for (int i = 0; i < size - 3; i++) {
+                if (!(lastDate.after(date1.get(i)) || secondLastDate.after(date1.get(i)) || thirdLastDate.after(date1.get(i)))) {
+                    lastThreeAfterAllMatches = false;
+                    System.out.println(lastDate);
+                    System.out.println(i);
+                    System.out.println(date1.get(i));
+                    System.out.println(secondLastDate);
+                    break;
+                }
+            }
+            if (lastThreeAfterAllMatches) {
+                if (!lastDate.before(secondLastDate)) {
+                    if (!secondLastDate.before(thirdLastDate) ) {
+                        // Assign umpires, venues, and dates to all matches
+                        int o = 0;
+                        for (Match m : allMatches) {
+                            m.setUmpire(umpires.get(o));
+                            m.setVenue(venues.get(o));
+                            m.setMatchDate(date1.get(o));
+                            o++;
+                        }
+                        Comparator<Match> matchComparator = new Comparator<Match>() {
+                            @Override
+                            public int compare(Match match1, Match match2) {
+                                // Compare the match dates
+                                int dateComparison = match1.getMatchDate().compareTo(match2.getMatchDate());
+                                if (dateComparison != 0) {
+                                    // If dates are different, return the result of date comparison
+                                    return dateComparison;
+                                } else {
+                                    // If dates are the same, compare the times
+                                    return match1.getMatchDate().compareTo(match2.getMatchDate());
+                                }
+                            }
+                        };
+                        allMatches.sort(matchComparator);
+                        matchService.saveAllMatches(allMatches);
+                        System.out.println("All" + umpires);
+                        System.out.println("All" + venues);
+                        System.out.println("All" + date1);
+                    } else {
+                        redirectAttributes.addFlashAttribute("error", "Second last match is before the third last match");
+                        return "redirect:/schedule2"; // Return error page
+                    }
+                } else {
+                    redirectAttributes.addFlashAttribute("error", "Last match is before the second last match");
+                    return "redirect:/schedule2"; // Return error page
+                }
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Last three matches are not after all the other matches");
+                return "redirect:/schedule2"; // Return error page
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Last three matches are not in sequence");
+            return "redirect:/schedule2"; // Return error page
+        }
+    } else {
+        redirectAttributes.addFlashAttribute("error", "There are not enough matches to proceed");
+        return "redirect:/schedule2"; // Return error page
+    }
+
+    String createTableQuery = "CREATE TABLE IF NOT EXISTS PlayerStats (id INT AUTO_INCREMENT PRIMARY KEY, matchId INT, playerId INT, runs INT, wickets INT)";
+    jdbcTemplate.execute(createTableQuery);
+    int currentTournamentId = tournament.getId();
+    List<Match> scheduledMatches = matchService.getAllMatchesByTournamentId(currentTournamentId);
+    for (Match match : scheduledMatches) {
+        List<Player> team1Players = playerService.getPlayersInfo(match.getTeam1id());
+        List<Player> team2Players = playerService.getPlayersInfo(match.getTeam2id());
+        for (Player player : team1Players) {
+            String insertQuery = "INSERT INTO PlayerStats (matchId, playerId, runs, wickets) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(insertQuery, match.getId(), player.getId(), 0, 0);
+        }
+        // Insert data for team 2 players
+        for (Player player : team2Players) {
+            String insertQuery = "INSERT INTO PlayerStats (matchId, playerId, runs, wickets) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(insertQuery, match.getId(), player.getId(), 0, 0); // Set runs and wickets to 0 for team 2 players
+        }
+    }
+    return "redirect:/";
+}
+
+    private boolean isValidTournamentDate(Date date, Tournament tournament) {
+        // Validate the date against tournament start and end dates
+        return !date.before(tournament.getTournamentStartDate()) && !date.after(tournament.getTournamentEndDate());
+    }
+
+    @GetMapping("/schedule2")
+    public String ManuallyTournamentSchedule(HttpServletRequest request, HttpSession session, Model model) {
+        Tournament tournament = (Tournament) session.getAttribute("tournament");
+        List<String> umpires = tournament.getUmpires();
+        List<String> venues = tournament.getVenues();
+        List<Match> allMatches = generateAllMatches(tournament);
+        session.setAttribute("allMatches", allMatches);
+        model.addAttribute("tournament", tournament);
+        model.addAttribute("allMatches", allMatches);
+        model.addAttribute("umpires", umpires);
+        model.addAttribute("venues", venues);
+        return "ShedulingTournament/ShedulingTournament2";
+    }
+
+    private List<Match> generateAllMatches(Tournament tournament) {
+        List<Integer> teamNameIds = tournament.getTeamNameIds();
+        List<String> teamNames = tournament.getTeamNames();
+        List<String> umpires = tournament.getUmpires();
+        List<String> venues = tournament.getVenues();
+        int tournamentId = tournament.getId();
+        List<Match> matches = new ArrayList<>();
+        // Generate matches for each combination of teams
+        for (int i = 0; i < teamNames.size(); i++) {
+            for (int j = i + 1; j < teamNames.size(); j++) {
+                Match match = new Match();
+                match.setTournamentid(tournamentId);
+                match.setTeam1(teamNames.get(i));
+                match.setTeam2(teamNames.get(j));
+                match.setTeam1id(teamNameIds.get(i));
+                match.setTeam2id(teamNameIds.get(j));
+                match.setUmpire(getRandomItemFromList(umpires));
+                match.setVenue(getRandomItemFromList(venues));
+                match.setComplete(false);
+                matches.add(match);
+            }
+        }
+        addAdditionalMatches(matches, 3, tournamentId, umpires, venues);
+        return matches;
+    }
+
     @PostMapping("/schedule1")
     public String automateTornamentShedule(HttpServletRequest request, HttpSession session, Model model) {
         Tournament tournament = (Tournament) session.getAttribute("tournament");
+        model.addAttribute("showLoadingModal", true);
         List<Integer> teamNameIds = tournament.getTeamNameIds();
         List<String> teamNames = tournament.getTeamNames();
         List<String> umpires = tournament.getUmpires();
@@ -432,24 +611,16 @@ public class TournamentController {
         Date startDate = tournament.getTournamentStartDate();
         Date endDate = tournament.getTournamentEndDate();
         List<Match> matches = new ArrayList<>();
-
-        // Calculate the number of days between start and end dates
         long diffInMillies = Math.abs(endDate.getTime() - startDate.getTime());
         long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
-//        // Shuffle the team names
-//        Collections.shuffle(teamNames);
-
         // Generate all possible match combinations without assigning dates yet
         List<Match> allMatches = generateMatches(teamNames, teamNameIds, umpires, venues, tournament.getId());
         // Shuffle the matches
         Collections.shuffle(allMatches);
         addAdditionalMatches(allMatches, 3, tournament.getId(), umpires, venues);
-
         // Calculate the number of days between each match
         int totalMatches = allMatches.size();
         long daysBetweenMatches = diffInDays / totalMatches;
-
         // Assign dates and times to matches in a pattern
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(startDate);
@@ -460,14 +631,10 @@ public class TournamentController {
             int minute = random.nextInt(60); // Random minute between 0 and 59
             calendar.set(Calendar.HOUR_OF_DAY, hour);
             calendar.set(Calendar.MINUTE, minute);
-
             match.setMatchDate(calendar.getTime());
             matches.add(match);
-
-            // Increment match date by the number of days between matches
             calendar.add(Calendar.DAY_OF_MONTH, (int) daysBetweenMatches);
         }
-
         matchService.saveAllMatches(matches);
         String createTableQuery = "CREATE TABLE IF NOT EXISTS PlayerStats (id INT AUTO_INCREMENT PRIMARY KEY, matchId INT, playerId INT, runs INT, wickets INT)";
         jdbcTemplate.execute(createTableQuery);
@@ -496,7 +663,6 @@ public class TournamentController {
             for (int j = i + 1; j < teamNames.size(); j++) {
                 Match match = new Match();
                 match.setTournamentid(tournamentId);
-
                 match.setTeam1(teamNames.get(i));
                 match.setTeam2(teamNames.get(j));
                 match.setTeam1id(teamNameIds.get(i));
@@ -524,23 +690,10 @@ public class TournamentController {
             matches.add(match);
         }
     }
-
-
     private String getRandomItemFromList(List<String> list) {
         Random random = new Random();
         return list.get(random.nextInt(list.size()));
     }
-
-    private Date getRandomDateInRange(Date startDate, Date endDate) {
-        long startMillis = startDate.getTime();
-        long endMillis = endDate.getTime();
-        long randomMillisSinceEpoch = ThreadLocalRandom
-                .current()
-                .nextLong(startMillis, endMillis);
-
-        return new Date(randomMillisSinceEpoch);
-    }
-
     @GetMapping("/viewTournament")
     public String displayTournament(@RequestParam("id") int id, Model model) {
         System.out.println("ID-> " + id);
@@ -549,13 +702,8 @@ public class TournamentController {
             return "error1";
         }
         Schedule schedule = new Schedule();
-
         scheduleService.populateAllMatchesByTournamentid(schedule, id);
-
         Tournament tournament = optionalTournament.get();
-
-        System.out.println("Tournament Details:");
-        System.out.println(tournament);
         int x = 0;
         boolean allMatchesComplete = true;
         int lastMatchIndex = schedule.getListOfTotalMatches().size() - 1;
@@ -570,23 +718,16 @@ public class TournamentController {
             }
             x = schedule.getListOfTotalMatches().get(i).getId();
         }
-
         Match lastScheduledMatch = schedule.getListOfTotalMatches().get(lastMatchIndex);
         if (lastScheduledMatch==null) {
             return "error1";
         }
-        System.out.println(lastScheduledMatch.getWon());
         model.addAttribute("lastScheduledMatch", lastScheduledMatch.getWon());
         model.addAttribute("tournament", tournament);
         model.addAttribute("schedule", schedule);
-        System.out.println("All matches:");
-        for (Match match : schedule.getListOfTotalMatches()) {
-            System.out.println(match);
-        }
         List<String> formattedDates = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy ha", Locale.ENGLISH);
         for (Match match : schedule.getListOfTotalMatches()) {
-            System.out.println(match);
             formattedDates.add(dateFormat.format(match.getMatchDate()));
         }
         model.addAttribute("formattedDates", formattedDates);
@@ -597,11 +738,10 @@ public class TournamentController {
     public String editTournament(@RequestParam("id") int id, HttpServletRequest request, Model model) {
         Schedule schedule = new Schedule();
         scheduleService.populateAllMatchesByTournamentid(schedule, id);
-if(schedule.getListOfTotalMatches().size()==0)
-{
-    return "error1";
-}
-int d;
+        if(schedule.getListOfTotalMatches().size()==0)
+        {
+           return "error1";
+        }
         Optional<Tournament> optionalTournament = tservice.getTournamentInfo(id);
         if (!optionalTournament.isPresent()) {
             return "error1"; // Or handle the absence of tournament data appropriately
@@ -610,15 +750,8 @@ int d;
         if (tournament.getUserId() == null || !tournament.getUserId().equals(request.getSession().getAttribute("userId"))) {
             return "error1"; // Or handle unauthorized access appropriately
         }
-        System.out.println("Tournament Details:");
-        System.out.println(tournament);
-
         model.addAttribute("tournament", tournament);
         model.addAttribute("schedule", schedule);
-//        System.out.println("All matches:");
-//        for (Match match : schedule.getListOfTotalMatches()) {
-//            System.out.println(match);
-//        }
         List<String> formattedDates = new ArrayList<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy ha", Locale.ENGLISH);
         for (Match match : schedule.getListOfTotalMatches()) {
@@ -658,8 +791,6 @@ int d;
             }
         }
         team1Query += ")";
-
-        // SQL query to get runs and wickets for team 2 players
         String team2Query = "SELECT runs, wickets FROM PlayerStats WHERE matchId = ? AND playerId IN (";
         for (int i = 0; i < team2Players.size(); i++) {
             team2Query += team2Players.get(i).getId();
@@ -670,8 +801,6 @@ int d;
         team2Query += ")";
         List<Map<String, Object>> team1Stats = jdbcTemplate.queryForList(team1Query, matchId);
         List<Map<String, Object>> team2Stats = jdbcTemplate.queryForList(team2Query, matchId);
-        System.out.println("-------" + matchId);
-// Update team1Players with runs and wickets data
         for (int i = 0; i < team1Players.size(); i++) {
             Map<String, Object> playerStats = team1Stats.get(i);
             int runs = (int) playerStats.get("runs");
@@ -680,8 +809,6 @@ int d;
             team1Players.get(i).setRuns(runs);
             team1Players.get(i).setWickets(wickets);
         }
-
-// Update team2Players with runs and wickets data
         for (int i = 0; i < team2Players.size(); i++) {
             Map<String, Object> playerStats = team2Stats.get(i);
             int runs = (int) playerStats.get("runs");
@@ -695,13 +822,8 @@ int d;
         model.addAttribute("scoreCard", scoreCard);
         model.addAttribute("team1Players", team1Players);
         model.addAttribute("team2Players", team2Players);
-
         return "EditShedule2";
-
     }
-
-
-
     @GetMapping("/PointsTable")
     public String viewPointsTable(@RequestParam("id") int tournamentId, Model model) {
         Optional<Tournament> optionalTournament = tservice.getTournamentInfo(tournamentId);
@@ -725,7 +847,6 @@ int d;
         if (!optionalTournament.isPresent()) {
             return "error1";
         }
-        // SQL query to retrieve the top 5 players with the highest total_runs and total_wickets for the given tournament
         String topRunScorersQuery = "SELECT p.* " +
                 "FROM team_name tn " +
                 "JOIN players p ON tn.id = p.team_id " +
@@ -739,52 +860,33 @@ int d;
                 "WHERE tn.tournament_id = ? " +
                 "ORDER BY p.total_wickets DESC " +
                 "LIMIT 5";
-
         try (Connection connection = dataSource.getConnection();
              PreparedStatement runScorersStatement = connection.prepareStatement(topRunScorersQuery);
              PreparedStatement wicketTakersStatement = connection.prepareStatement(topWicketTakersQuery)) {
-
-            // Set the tournament id parameters
             runScorersStatement.setInt(1, tournamentId);
             wicketTakersStatement.setInt(1, tournamentId);
-
-            // Execute the queries
             ResultSet runScorersResultSet = runScorersStatement.executeQuery();
             ResultSet wicketTakersResultSet = wicketTakersStatement.executeQuery();
-
-            // Create lists to hold the top 5 run scorers and top 5 wicket takers
             List<Player> topRunScorers = new ArrayList<>();
             List<Player> topWicketTakers = new ArrayList<>();
-
-            // Retrieve top run scorers
             while (runScorersResultSet.next()) {
-                // Extract player information from the result set
                 Player player = extractPlayerInfo(runScorersResultSet);
                 topRunScorers.add(player);
             }
-
-            // Retrieve top wicket takers
             while (wicketTakersResultSet.next()) {
-                // Extract player information from the result set
                 Player player = extractPlayerInfo(wicketTakersResultSet);
                 topWicketTakers.add(player);
             }
-
             Tournament tournament = optionalTournament.orElse(null);
             model.addAttribute("tournament", tournament);
             model.addAttribute("topRunScorers", topRunScorers);
             model.addAttribute("topWicketTakers", topWicketTakers);
-
         } catch (SQLException ex) {
             ex.printStackTrace();
-            // Handle SQL exception
         }
-
-        // Return the view name
         return "Stats1";
     }
 
-    // Helper method to extract player information from the result set
     private Player extractPlayerInfo(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("id");
         int teamId = resultSet.getInt("team_id");
@@ -793,7 +895,6 @@ int d;
         int totalRuns = resultSet.getInt("total_runs");
         int wickets = resultSet.getInt("wickets");
         int totalWickets = resultSet.getInt("total_wickets");
-
         Player player = new Player();
         player.setId(id);
         player.setTeamId(teamId);
@@ -802,13 +903,8 @@ int d;
         player.setTotalRuns(totalRuns);
         player.setWickets(wickets);
         player.setTotalWickets(totalWickets);
-
         return player;
     }
-
-
-
-
     @GetMapping("generateSemiFinal")
     public String generateSemiFinal1(@RequestParam("tournamentId") int tournamentId, Model model) {
         Schedule schedule = new Schedule();
@@ -873,23 +969,18 @@ int d;
         String sqlUpdateMatch = "UPDATE matches " +
                 "SET team1id = ?, team1 = ?, team2id = ?, team2 = ? " +
                 "WHERE id = ?";
-
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sqlUpdateMatch)) {
-
             statement.setInt(1, team1Id);
             statement.setString(2, team1Name);
             statement.setInt(3, team2Id);
             statement.setString(4, team2Name);
             statement.setInt(5, matchIndex);
             statement.executeUpdate();
-
         } catch (SQLException e) {
             e.printStackTrace(); // Log or handle the exception appropriately
         }
     }
-
-
     private void updateMatch(int team1Id, String team1Name, int team2Id, String team2Name, int tournamentId, int matchIndex) {
         String sqlUpdateMatch = "UPDATE matches " +
                 "SET team1id = ?, team1 = ?, team2id = ?, team2 = ? " +
@@ -898,10 +989,8 @@ int d;
                 "        SELECT id FROM matches WHERE tournamentid = ? ORDER BY id DESC LIMIT ?, 1 " +
                 "    ) AS temp " +
                 ")";
-
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sqlUpdateMatch)) {
-
             statement.setInt(1, team1Id);
             statement.setString(2, team1Name);
             statement.setInt(3, team2Id);
@@ -909,30 +998,22 @@ int d;
             statement.setInt(5, tournamentId);
             statement.setInt(6, tournamentId);
             statement.setInt(7, matchIndex - 1); // Adjusted index for SQL's 0-based indexing
-
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle SQL exception
         }
     }
 
     private void storePlayerStats(int matchId, int team1Id, int team2Id, int tournamentId) {
         List<Player> team1Players = playerService.getPlayersInfo(team1Id);
         List<Player> team2Players = playerService.getPlayersInfo(team2Id);
-
         for (Player player : team1Players) {
             String insertQuery = "INSERT INTO PlayerStats (matchId, playerId, runs, wickets) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(insertQuery, matchId, player.getId(), 0, 0);
         }
-
         for (Player player : team2Players) {
             String insertQuery = "INSERT INTO PlayerStats (matchId, playerId, runs, wickets) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(insertQuery, matchId, player.getId(), 0, 0);
         }
-        System.out.println(team1Players);
-        System.out.println(team2Players);
     }
-
-
 }

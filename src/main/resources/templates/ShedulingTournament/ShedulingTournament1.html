@@ -5,7 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <title>Shedule</title>
+    <title>Schedule</title>
+    <style>
+        /* Styles for the loading bar modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body class="bg-color-primary text-color-white tracking-wider">
 <header>
@@ -27,16 +51,24 @@
     <div class="bg-color-secondary p-2 rounded-lg border-2 border-black flex">
         <div class=" px-8">
             <h2 class="font-bold text-2xl mb-4 text-color-primary">Tournament Info</h2>
-            <form th:action="@{/schedule1}" method="post">
+            <div id="loadingModal" th:if="${showLoadingModal}" class="modal">
+                <div class="modal-content">
+                    <i class="fas fa-spinner fa-spin fa-4x text-green-500"></i>
+                    <p>Loading... (If you Back from here your Tournament will not generate Properly)</p>
+                </div>
+            </div>
+            <form th:action="@{/schedule1}" method="post" th:object="${tournament}">
                 <div class="flex flex-col items-center">
                     <button type="submit" class="border-2 border-color-primary bg-green-500 px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200 mb-3">Generate Schedule Automatically</button>
                 </div>
             </form>
-            <form th:action="@{/schedule2}" method="post">
+            <form th:action="@{/schedule2}" method="get" th:object="${tournament}">
                 <div class="flex flex-col items-center">
                     <button type="submit" class="border-2 border-color-primary bg-green-500 px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200 mb-3">Generate Schedule Manually</button>
                 </div>
             </form>
+<!--            th:onclick="'window.location.href = \'/schedule2'"-->
+            <p class="text-lg font-bold text-color-primary" >Please wait. After clicking any button, you will be automatically redirected to the homepage unless no matches will be generated.</p>
         </div>
     </div>
 </section>

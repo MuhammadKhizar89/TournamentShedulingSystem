@@ -37,7 +37,8 @@
                 <h2 class="font-bold text-xl text-color-primary">Username</h2>
                 <input required class="p-2 mt-2 mb-4 px-4 py-3 rounded-xl text-black border-2 border-color-primary" type="text" name="username" placeholder="Enter Your Name" />
                 <h2 class="font-bold text-xl text-color-primary">Password</h2>
-                <input required class="p-2 mt-2 mb-4 px-4 py-3 rounded-xl text-black border-2 border-color-primary" type="password" name="password" placeholder="Password" />
+                <input required class="p-2 mt-2 mb-1 px-4 py-3 rounded-xl text-black border-2 border-color-primary" type="password" name="password" placeholder="Password" />
+                <a href="/signup" class="text-color-primary  hover:underline font-bold text-sm">Create an Account?</a>
                 <button data-modal-target="authentication-modal" class="mt-8 bg-color-primary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">Login</button>
                 <p th:if="${error}" class="text-red-500 mt-2" th:text="${error}"></p>
             </form>

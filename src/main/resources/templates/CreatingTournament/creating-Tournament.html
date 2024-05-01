@@ -34,6 +34,8 @@
             <img class="rounded-2xl object-scale-down border-2 border-color-primary h-full w-96" th:src="@{pic4.jpg}" />
         </div>
         <div class="sm:w-1/2 px-8">
+            <p th:if="${error}" class="text-white text-bold mt-2" th:text="${error}"></p>
+
             <h2 class="font-bold text-2xl mb-4 text-color-primary">Tournament Info</h2>
             <form th:action="@{/tournamentnew}" th:object="${tournamentForm}" method="post" class="flex flex-col">
                 <!-- No of Teams -->
@@ -69,6 +71,7 @@
                     <button data-modal-target="authentication-modal" class="mt-8 bg-color-primary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200" onclick="window.location.href='/';">Back</button>
                     <button data-modal-target="authentication-modal" class="mt-8 border-2 border-color-primary bg-green-500 px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200" id="abc">Next</button>
                 </div>
+
             </form>
         </div>
     </div>

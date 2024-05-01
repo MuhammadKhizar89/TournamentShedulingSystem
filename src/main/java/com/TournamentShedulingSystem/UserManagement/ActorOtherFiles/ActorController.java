@@ -1,5 +1,4 @@
 package com.TournamentShedulingSystem.UserManagement.ActorOtherFiles;
-
 import com.TournamentShedulingSystem.TournamentManagement.TournamentOtherFiles.TournamentService;
 import com.TournamentShedulingSystem.UserManagement.Actor;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,7 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-
 @Controller // Use @Controller instead of @RestController
 public class ActorController {
     private final ActorService actorService;
@@ -19,7 +17,7 @@ public class ActorController {
     }
     @PostMapping("/signup1")
     public String signup1(@RequestParam String username, @RequestParam String password, @RequestParam String confirmPassword, HttpSession session,HttpServletRequest  request,Model model) {
-        // Check if username already exists
+         // Check if username already exists
         if (actorService.existsByUsername(username)) {
             model.addAttribute("error", "Username already exists");
             return "signup_Page"; // Return the signup form view with error message
@@ -34,14 +32,11 @@ public class ActorController {
             Actor actor = new Actor();
             actor.setUsername(username);
             actor.setPassword(password);
-
             // Save the actor
             Actor savedActor = actorService.signin(actor);
-
             // Set session attributes
             session.setAttribute("username", actor.getUsername());
             session.setAttribute("userId", savedActor.getId());
-System.out.println(request.getSession().getAttribute("userId"));
             return "redirect:/"; // Redirect to root URL after successful signup
         }
     }
@@ -63,15 +58,8 @@ System.out.println(request.getSession().getAttribute("userId"));
                 return "redirect:/"; // Redirect to root URL after successful signin
             }
         }
-        // User doesn't exist or invalid credentials, display error message on the sign-in form
         model.addAttribute("error", "Invalid username or password"); // Add error message to model
         return "signin_Page"; // Return the sign-in form view
     }
-
-
-
-
-
-
 }
 

@@ -41,8 +41,9 @@
                 <h2 class="font-bold text-xl text-color-primary">Password</h2>
                 <input required class="p-2 mt-2 mb-4 px-4 py-3 rounded-xl text-black border-2 border-color-primary" type="password" name="password" placeholder="Password">
                 <h2 class="font-bold text-xl text-color-primary">Confirm Password</h2>
-                <input required class="p-2 mt-2 mb-4 px-4 py-3 rounded-xl text-black border-2 border-color-primary" type="password" name="confirmPassword" placeholder="Confirm Password">
+                <input required class="p-2 mt-2 mb-1 px-4 py-3 rounded-xl text-black border-2 border-color-primary" type="password" name="confirmPassword" placeholder="Confirm Password">
                 <div th:if="${passwordMismatch}" class="text-red-800 mb-4">Error: Passwords do not match</div>
+                <a href="/signin" class="text-color-primary  hover:underline font-bold text-sm">Already Have an Account?</a>
                 <button data-modal-target="authentication-modal" class="mt-8 bg-color-primary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">Create</button>
             </form>
 
