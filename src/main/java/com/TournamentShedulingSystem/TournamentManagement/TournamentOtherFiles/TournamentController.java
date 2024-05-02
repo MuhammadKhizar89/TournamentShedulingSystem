@@ -1,4 +1,5 @@
 package com.TournamentShedulingSystem.TournamentManagement.TournamentOtherFiles;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.TournamentShedulingSystem.TournamentManagement.MatchManagement.Comments;
@@ -1016,4 +1017,32 @@ public String confirmSchedule(HttpServletRequest request, HttpSession session, M
             jdbcTemplate.update(insertQuery, matchId, player.getId(), 0, 0);
         }
     }
+
+   /* @GetMapping("/tournamentsPerMonth")
+    public String tournamentsPerMonth(Model model) {
+        Map<String, Integer> tournamentsPerMonth = tservice.getTournamentsPerMonth();
+        model.addAttribute("tournamentsPerMonth", tournamentsPerMonth);
+        return "tournamentsPerMonth";
+    }*/
+
+        @GetMapping("/tournamentsPerMonth")
+        public ResponseEntity<Map<String, Integer>> getTournamentsPerMonth() {
+            Map<String, Integer> tournamentsPerMonth = tservice.getTournamentsPerMonth();
+            return ResponseEntity.ok(tournamentsPerMonth);
+        }
+
+  /*  @GetMapping("/getTournamentsPerMonthData")
+    @ResponseBody
+    public List<Map<String, Object>> getTournamentsPerMonthData() {
+        List<Map<String, Object>> data = new ArrayList<>();
+        Map<String, Integer> tournamentsPerMonth = tservice.getTournamentsPerMonth();
+        tournamentsPerMonth.forEach((month, count) -> {
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("month", month);
+            entry.put("count", count);
+            data.add(entry);
+        });
+        return data;
+    }*/
+
 }

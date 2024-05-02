@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Admin Dashboard</title>
+</head>
+<body class="bg-color-primary text-color-white tracking-wider">
+<header>
+    <nav class="container flex justify-between items-center relative">
+        <div class="w-[44rem] py-5 text-color-secondary font-bold text-2xl">
+            <a href="/">
+                <div class="text-color-white">Tournament Scheduling</div>
+                System
+            </a>
+        </div>
+        <div>
+            <ul class="hidden lg:flex items-center space-x-2">
+                <li><a href="#" class="text-color-secondary ease-in duration-200 mr-2">Admin Panel</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<main class="container pt-20">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <button class="bg-color-secondary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">
+            <a href="#">Graph of Matches</a>
+        </button>
+        <button class="bg-color-secondary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">
+            <a href="#">Graph of Viewers</a>
+        </button>
+        <button class="bg-color-secondary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">
+            <a href="/tournamentsPerMonth">Graph of Tournaments Scheduled</a>
+        </button>
+    </div>
+</main>
+</body>
+</html>
