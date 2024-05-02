@@ -55,7 +55,14 @@ public class ActorController {
             if (userId != null) {
                 session.setAttribute("username", username);
                 session.setAttribute("userId", userId);
+                if (userId==1)
+                {
+                    return "adminDashboard"; //redirecting to admin pannel
+                }
+                else
+                {
                 return "redirect:/"; // Redirect to root URL after successful signin
+                }
             }
         }
         model.addAttribute("error", "Invalid username or password"); // Add error message to model
