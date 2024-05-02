@@ -1,4 +1,7 @@
 package com.TournamentShedulingSystem.TournamentManagement.TournamentOtherFiles;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -422,6 +425,7 @@ public class TournamentController {
 //        return "confirmation-page"; // Return the name of the confirmation page
 //    }
 @PostMapping("/confirmSchedule")
+@Transactional
 public String confirmSchedule(HttpServletRequest request, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
     Tournament tournament = (Tournament) session.getAttribute("tournament");
     List<String> umpires = new ArrayList<>();
@@ -553,6 +557,12 @@ public String confirmSchedule(HttpServletRequest request, HttpSession session, M
             jdbcTemplate.update(insertQuery, match.getId(), player.getId(), 0, 0); // Set runs and wickets to 0 for team 2 players
         }
     }
+    int updatedRows = entityManager.createNativeQuery(
+                    "INSERT INTO NoofMatches (tournamentid, noofmatches) " +
+                            "VALUES (?, ?) ")
+            .setParameter(1, tournament.getId())
+            .setParameter(2, allMatches.size())
+            .executeUpdate();
     return "redirect:/";
 }
 
@@ -602,6 +612,7 @@ public String confirmSchedule(HttpServletRequest request, HttpSession session, M
     }
 
     @PostMapping("/schedule1")
+    @Transactional
     public String automateTornamentShedule(HttpServletRequest request, HttpSession session, Model model) {
         Tournament tournament = (Tournament) session.getAttribute("tournament");
         model.addAttribute("showLoadingModal", true);
@@ -655,6 +666,12 @@ public String confirmSchedule(HttpServletRequest request, HttpSession session, M
             }
         }
 
+        int updatedRows = entityManager.createNativeQuery(
+                        "INSERT INTO NoofMatches (tournamentid, noofmatches) " +
+                                "VALUES (?, ?) ")
+                .setParameter(1, tournament.getId())
+                .setParameter(2, matches.size())
+                .executeUpdate();
         return "redirect:/";
     }
 
@@ -694,14 +711,23 @@ public String confirmSchedule(HttpServletRequest request, HttpSession session, M
     private String getRandomItemFromList(List<String> list) {
         Random random = new Random();
         return list.get(random.nextInt(list.size()));
-    }
+
+    } @PersistenceContext
+    private EntityManager entityManager;
     @GetMapping("/viewTournament")
+    @Transactional
     public String displayTournament(@RequestParam("id") int id, Model model) {
         System.out.println("ID-> " + id);
         Optional<Tournament> optionalTournament = tservice.getTournamentInfo(id);
         if (!optionalTournament.isPresent()) {
             return "error1";
         }
+        String sqlQuery = "INSERT INTO Viewer (tournamentid, noofviewers) " +
+                "VALUES (?, 1) " +
+                "ON DUPLICATE KEY UPDATE noofviewers = noofviewers + 1";
+        int updatedRows = entityManager.createNativeQuery(sqlQuery)
+                .setParameter(1, id)
+                .executeUpdate();
         Schedule schedule = new Schedule();
         scheduleService.populateAllMatchesByTournamentid(schedule, id);
         Tournament tournament = optionalTournament.get();
@@ -1024,12 +1050,59 @@ public String confirmSchedule(HttpServletRequest request, HttpSession session, M
         model.addAttribute("tournamentsPerMonth", tournamentsPerMonth);
         return "tournamentsPerMonth";
     }*/
+   @GetMapping("/tournamentsPerMonth")
+   public String getTournamentsPerMonth(Model model) {
+       Map<String, Integer> tournamentsPerMonth = tservice.getTournamentsPerMonth();
+       model.addAttribute("graphData", tournamentsPerMonth); // Corrected attribute name
+       return "tournamentsPerMonth1";
+   }
 
-        @GetMapping("/tournamentsPerMonth")
-        public ResponseEntity<Map<String, Integer>> getTournamentsPerMonth() {
-            Map<String, Integer> tournamentsPerMonth = tservice.getTournamentsPerMonth();
-            return ResponseEntity.ok(tournamentsPerMonth);
+    @GetMapping("/viewersPerTournament")
+    public String getViewersperMont(Model model) {
+        // 1. Write a query to fetch data from the Viewer table
+        String sqlQuery = "SELECT tournamentid, noofviewers FROM Viewer";
+        // 2. Execute the query and process the result
+        List<Object[]> result = entityManager.createNativeQuery(sqlQuery).getResultList();
+        Map<String, Integer> viewersPerTournament = new HashMap<>();
+        for (Object[] row : result) {
+            int tournamentId = (Integer) row[0];
+            int numberOfViewers = (Integer) row[1];
+            // Fetch tournament name based on tournament ID
+            Optional<Tournament> optionalTournament = tservice.getTournamentInfo(tournamentId);
+            if (optionalTournament.isPresent()) {
+                String tournamentName = optionalTournament.get().getNameOfTournament();
+                viewersPerTournament.put(tournamentName, numberOfViewers);
+            }
         }
+        // 3. Pass the data to the HTML page through the model
+        model.addAttribute("viewersPerTournament", viewersPerTournament);
+        return "ViewersPerTournament2";
+    }
+
+    @GetMapping("/matchesPerTournament")
+    public String getMatchesPerTournament(Model model) {
+        // 1. Write a query to fetch data from the NoofMatches table
+        String sqlQuery = "SELECT tournamentid, noofmatches FROM NoofMatches";
+        // 2. Execute the query and process the result
+        List<Object[]> result = entityManager.createNativeQuery(sqlQuery).getResultList();
+        Map<String, Integer> matchesPerTournament = new HashMap<>();
+        for (Object[] row : result) {
+            int tournamentId = (Integer) row[0];
+            int numberOfMatches = (Integer) row[1];
+            // Fetch tournament name based on tournament ID
+            Optional<Tournament> optionalTournament = tservice.getTournamentInfo(tournamentId);
+            if (optionalTournament.isPresent()) {
+                String tournamentName = optionalTournament.get().getNameOfTournament();
+                matchesPerTournament.put(tournamentName, numberOfMatches);
+            }
+        }
+        // 3. Pass the data to the HTML page through the model
+        model.addAttribute("matchesPerTournament", matchesPerTournament);
+        return "MatchesPerTournament2";
+    }
+
+
+
 
   /*  @GetMapping("/getTournamentsPerMonthData")
     @ResponseBody

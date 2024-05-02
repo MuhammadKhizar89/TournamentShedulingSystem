@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tournaments Per Month</title>
+  <!-- Include Chart.js library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    #tournamentsChart {
+      width: 600px;
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="tournamentsChart"></canvas>
+<script th:inline="javascript">
+  /* Extract data from Thymeleaf model attribute */
+  var graphData = /*[[ ${graphData} ]]*/ {};
+  /* Create an array of months and corresponding tournament counts */
+  var months = Object.keys(graphData);
+  var tournamentCounts = Object.values(graphData);
+  /* Create a line chart */
+  var ctx = document.getElementById('tournamentsChart').getContext('2d');
+  var tournamentsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+          labels: months,
+          datasets: [{
+              label: 'Tournaments Per Month',
+              data: tournamentCounts,
+              backgroundColor: 'rgba(255, 99, 132, 0.6)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+          }]
+      },
+      options: {
+          responsive: false
+      }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matches Per Tournament</title>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        #matchesChart {
+          width: 600px;
+          height: 400px;
+          margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="matchesChart"></canvas>
+<script th:inline="javascript">
+    /* Extract data from Thymeleaf model attribute */
+    var matchesPerTournament = /*[[ ${matchesPerTournament} ]]*/ {};
+    /* Create an array of tournament names and corresponding number of matches */
+    var tournamentNames = Object.keys(matchesPerTournament);
+    var numberOfMatches = Object.values(matchesPerTournament);
+    /* Create a bar chart */
+    var ctx = document.getElementById('matchesChart').getContext('2d');
+    var matchesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: tournamentNames,
+            datasets: [{
+                label: 'Number of Matches Per Tournament',
+                data: numberOfMatches,
+                backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

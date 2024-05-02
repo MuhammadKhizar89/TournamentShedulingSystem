@@ -11,30 +11,31 @@
 <header>
     <nav class="container flex justify-between items-center relative">
         <div class="w-[44rem] py-5 text-color-secondary font-bold text-2xl">
-            <a href="/">
+            <a >
                 <div class="text-color-white">Tournament Scheduling</div>
                 System
             </a>
         </div>
         <div>
-            <ul class="hidden lg:flex items-center space-x-2">
-                <li><a href="#" class="text-color-secondary ease-in duration-200 mr-2">Admin Panel</a></li>
-            </ul>
         </div>
     </nav>
 </header>
-
-<main class="container pt-20">
+<h1 class="text-2xl text-center ">Admin Panel</h1>
+<main class="container pt-20 flex justify-center items-center">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <button class="bg-color-secondary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">
-            <a href="#">Graph of Matches</a>
+        <a href="/matchesPerTournament"><button class="bg-color-secondary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">
+            Graph of Matches
         </button>
-        <button class="bg-color-secondary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">
-            <a href="#">Graph of Viewers</a>
+        </a>
+        <a href="/viewersPerTournament"><button class="bg-color-secondary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">
+            Graph of Viewers
         </button>
-        <button class="bg-color-secondary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">
-            <a href="/tournamentsPerMonth">Graph of Tournaments Scheduled</a>
+        </a>
+        <a href="/tournamentsPerMonth"><button class="bg-color-secondary px-4 py-3 rounded-md capitalize font-bold hover:opacity-80 ease-in duration-200">
+            Graph of Tournaments Scheduled
         </button>
+        </a>
+        <button type="submit" class="  m-8 bg-color-secondary px-3 py-3 rounded-md capitalize font-bold hover:opacity-200 ease-in duration-200"><a href="logout">Logout</a></button>
     </div>
 </main>
 </body>

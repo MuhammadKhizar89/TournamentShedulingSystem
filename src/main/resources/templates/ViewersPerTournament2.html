@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viewers Per Tournament</title>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        #viewersChart {
+          width: 600px;
+          height: 400px;
+          margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="viewersChart"></canvas>
+<script th:inline="javascript">
+    /* Extract data from Thymeleaf model attribute */
+    var viewersPerTournament = /*[[ ${viewersPerTournament} ]]*/ {};
+    /* Create an array of tournament IDs and corresponding number of viewers */
+    var tournamentIds = Object.keys(viewersPerTournament);
+    var numberOfViewers = Object.values(viewersPerTournament);
+    /* Create a bar chart */
+    var ctx = document.getElementById('viewersChart').getContext('2d');
+    var viewersChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: tournamentIds,
+            datasets: [{
+                label: 'Number of Viewers Per Tournament',
+                data: numberOfViewers,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

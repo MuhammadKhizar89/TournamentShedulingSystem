@@ -48,6 +48,14 @@ public class ActorController {
     public String signin_Page(){
         return "signin_Page";
     }
+    @GetMapping("/admin")
+     public String admin( HttpServletRequest request){
+        Long userId = (Long) request.getSession().getAttribute("userId"); // Get userId from session
+        if(userId ==1){
+            return "adminDashboard"; //redirecting to admin pannel
+        }
+        return "error1";
+    }
     @PostMapping("/signin1")
     public String signin1(@RequestParam String username, @RequestParam String password, HttpSession session, Model model) {
         if (actorService.exists(username, password)) {
@@ -57,7 +65,7 @@ public class ActorController {
                 session.setAttribute("userId", userId);
                 if (userId==1)
                 {
-                    return "adminDashboard"; //redirecting to admin pannel
+                    return "redirect:/admin"; //redirecting to admin pannel
                 }
                 else
                 {
